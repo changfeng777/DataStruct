@@ -1,3 +1,14 @@
+/******************************************************************************************
+Copyright (c) Bit Software, Inc.(2013), All rights reserved.
+
+Purpose: 实现二叉树的基本操作     
+
+Author: xjh
+
+Reviser: yyy
+
+Created Time: 2015-8-6
+******************************************************************************************/
 #pragma once
 
 #include<queue>
@@ -8,7 +19,7 @@
 template<class T>
 struct BinaryTreeNode
 {
-	T _data;				// 数据
+	T _data;					// 数据
 	BinaryTreeNode<T>* _left;	// 左孩子
 	BinaryTreeNode<T>* _right;	// 右孩子
 
@@ -102,6 +113,10 @@ public:
 
 		while (!s.empty())
 		{
+			//
+			// 先访问根节点，先入右节点再入左节点，
+			// 出栈时才能先访问到左节点，再访问到右节点。
+			//
 			BinaryTreeNode<T>* root = s.top();
 			cout<<root->_data<<" ";
 			s.pop();
@@ -124,23 +139,59 @@ public:
 	{
 		cout<<"InOrder_NonR:";
 		stack<BinaryTreeNode<T>*> s;
-		if (_root)
-		{
-			s.push(_root);
-		}
 
-		while (!s.empty())
-		{
-			BinaryTreeNode<T>* root = s.top();
+		BinaryTreeNode<T>* cur = _root;
 
-			if (root->_right)
+		while (cur || !s.empty())
+		{
+			// 1.先将左节点全部入栈
+			while (cur)
 			{
-				s.push(root->_right);
+				s.push(cur);
+				cur = cur->_left;
 			}
 
-			if (root->_left)
+			// 2.栈不为空时，访问栈顶节点，并将cur指向栈顶节点的右子树。
+			// 继续中序遍历右子树。
+			if (!s.empty())
 			{
-				s.push(root->_left);
+				BinaryTreeNode<T>* top = s.top();
+				cout<<top->_data<<" ";
+				s.pop();
+				cur = top->_right;
+			}
+		}
+
+		cout<<endl;
+	}
+
+	void PostOrder_NonR()
+	{
+		cout<<"PostOrder_NonR:";
+		stack<BinaryTreeNode<T>*> s;
+		BinaryTreeNode<T>* cur = _root;
+		BinaryTreeNode<T>* prevVisited = NULL;
+
+		while (cur || !s.empty())
+		{
+			// 入栈做孩子节点
+			while (cur)
+			{
+				s.push(cur);
+				cur = cur->_left;
+			}
+
+			// 2.右节点为空/之前右节点已经访问过了的时候访问当前的栈顶节点
+			BinaryTreeNode<T>* top = s.top();
+			if (top->_right == NULL || prevVisited == top->_right)
+			{
+				cout<<top->_data<<" ";
+				s.pop();
+				prevVisited = top;
+			}
+			else
+			{
+				cur = top->_right;
 			}
 		}
 

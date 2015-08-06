@@ -15,7 +15,9 @@ void TestBinaryTree()
 	tree.PrevOrder();
 	tree.PrevOrder_NonR();
 	tree.InOrder();
+	tree.InOrder_NonR();
 	tree.PostOrder();
+	tree.PostOrder_NonR();
 	tree.LevelOrder();
 
 	BinaryTreeNode<int>* ret = tree.Find(3);
