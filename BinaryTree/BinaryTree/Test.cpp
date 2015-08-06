@@ -3,6 +3,7 @@ using namespace std;
 
 #include"BinaryTree.hpp"
 #include"BinaryTreeTopic.hpp"
+#include "BinaryTreeThreading.hpp"
 
 void TestBinaryTree()
 {
@@ -34,6 +35,17 @@ void TestBinaryTree()
 	BinaryTree<int> treeCopy2;
 	treeCopy2 = tree;
 	treeCopy2.PrevOrder();
+}
+
+void TestBinaryTreeThd()
+{
+	int array[20] = {1, 2, 3, '#', '#', 4, '#', '#', 5, 6};
+	BinaryTree_Thd<int> tree;
+	tree.CreateTree(array, 10);
+	tree.InOrder();
+
+	tree.InThreading();
+	tree.InOrderThreading();
 }
 
 void TestBinaryTreeTopic()
@@ -130,8 +142,8 @@ void TestBinaryTreeTopic()
 
 int main()
 {
-	TestBinaryTree();
-
-	TestBinaryTreeTopic();
+	//TestBinaryTree();
+	//TestBinaryTreeTopic();
+	TestBinaryTreeThd();
 	return 0;
 }
