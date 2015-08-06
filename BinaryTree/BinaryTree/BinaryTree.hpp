@@ -38,6 +38,25 @@ public:
 		:_root(NULL)
 	{}
 
+	//
+	// 实现深拷贝二叉树
+	//
+	BinaryTree(const BinaryTree<T>& t)
+	{
+		this->_root = _CopyTree(t._root);
+	}
+
+	BinaryTree<T>& operator=(const BinaryTree<T>& t)
+	{
+		if (this != &t)
+		{
+			this->Destory();
+			this->_root = _CopyTree(t._root);
+		}
+
+		return *this;
+	}
+
 	~BinaryTree()
 	{
 		Destory();
@@ -307,6 +326,21 @@ protected:
 
 		return _Size(root->_left) + _Size(root->_right) + 1;
 	}
+
+	// 拷贝二叉树
+	BinaryTreeNode<T>* _CopyTree(BinaryTreeNode<T>* root)
+	{
+		BinaryTreeNode<T>* newRoot = NULL;
+		if (root)
+		{
+			newRoot = new BinaryTreeNode<T>(root->_data);
+			newRoot->_left = _CopyTree(root->_left);
+			newRoot->_right = _CopyTree(root->_right);
+		}
+
+		return newRoot;
+	}
+
 
 	void _Destory(BinaryTreeNode<T>* root)
 	{

@@ -27,6 +27,13 @@ void TestBinaryTree()
 	cout<<"Find 10?: "<<ret<<endl;
 
 	cout<<"Height:"<<tree.Height()<<endl;
+	
+	BinaryTree<int> treeCopy1 = tree;
+	treeCopy1.PrevOrder();
+
+	BinaryTree<int> treeCopy2;
+	treeCopy2 = tree;
+	treeCopy2.PrevOrder();
 }
 
 void TestBinaryTreeTopic()
