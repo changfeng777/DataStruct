@@ -1,10 +1,12 @@
 #include <iostream>
 using namespace std;
 
-#include"BinaryTree.hpp"
-#include"BinaryTreeTopic.hpp"
+#include "BinaryTree.hpp"
+#include "BinaryTreeTopic.hpp"
 #include "BinaryTreeThreading.hpp"
+#include "Heap.hpp"
 
+// ²âÊÔ¶þ²æÊ÷
 void TestBinaryTree()
 {
 	cout<<"TestBinaryTree:"<<endl;
@@ -37,6 +39,7 @@ void TestBinaryTree()
 	treeCopy2.PrevOrder();
 }
 
+// ²âÊÔÏßË÷»¯¶þ²æÊ÷
 void TestBinaryTreeThd()
 {
 	int array[20] = {1, 2, 3, '#', '#', 4, '#', '#', 5, 6};
@@ -48,6 +51,7 @@ void TestBinaryTreeThd()
 	tree.InOrderThreading();
 }
 
+// ²âÊÔ¶þ²æÊ÷±à³ÌÌâ
 void TestBinaryTreeTopic()
 {
 	cout<<endl;
@@ -140,10 +144,44 @@ void TestBinaryTreeTopic()
 	cout<<"OP2 Max Len:"<<maxLen<<endl;
 };
 
+// ²âÊÔ¶þ²æ¶Ñ
+void TestHeap()
+{
+	Heap<int, greater<int>> heap;
+	heap.Insert(3);
+	heap.Insert(5);
+	heap.Insert(1);
+	heap.Insert(4);
+	heap.Insert(5);
+	heap.Insert(1);
+	heap.Insert(8);
+
+	while (!heap.Empty())
+	{
+		cout<<heap.GetHeapTop()<<" ";
+		heap.Remove();
+	}
+	cout<<endl;
+
+	int array[10] = {9,1,3,5,6,7,8,0,2,4};
+	Heap<int> heap1(array, 10);
+
+	while (!heap1.Empty())
+	{
+		cout<<heap1.GetHeapTop()<<" ";
+		heap1.Remove();
+	}
+	cout<<endl;
+}
+
 int main()
 {
 	//TestBinaryTree();
 	//TestBinaryTreeTopic();
-	TestBinaryTreeThd();
+	//TestBinaryTreeThd();
+	TestHeap();
+
 	return 0;
 }
+
+
