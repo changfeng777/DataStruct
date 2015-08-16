@@ -5,6 +5,7 @@ using namespace std;
 #include "BinaryTreeTopic.hpp"
 #include "BinaryTreeThreading.hpp"
 #include "Heap.hpp"
+#include "RedPacket.hpp"
 
 // ²âÊÔ¶þ²æÊ÷
 void TestBinaryTree()
@@ -163,7 +164,8 @@ void TestHeap()
 	}
 	cout<<endl;
 
-	int array[10] = {9,1,3,5,6,7,8,0,2,4};
+	//int array[10] = {9,1,3,5,6,7,8,0,2,4};
+	int array[10] = {10,16,18,12,11,13,15,17,14,19};
 	Heap<int> heap1(array, 10);
 
 	while (!heap1.Empty())
@@ -179,7 +181,8 @@ int main()
 	//TestBinaryTree();
 	//TestBinaryTreeTopic();
 	//TestBinaryTreeThd();
-	TestHeap();
+	//TestHeap();
+	TestRedPacket();
 
 	return 0;
 }
