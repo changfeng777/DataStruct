@@ -358,3 +358,36 @@ protected:
 private:
 	BinaryTreeNode<T>* _root;	// 根节点
 };
+
+// 测试二叉树
+void TestBinaryTree()
+{
+	cout<<"TestBinaryTree:"<<endl;
+
+	int array[20] = {1, 2, 3, '#', '#', 4, '#', '#', 5, 6};
+	BinaryTree<int> tree;
+	tree.CreateTree(array, 10);
+
+	tree.PrevOrder();
+	tree.PrevOrder_NonR();
+	tree.InOrder();
+	tree.InOrder_NonR();
+	tree.PostOrder();
+	tree.PostOrder_NonR();
+	tree.LevelOrder();
+
+	BinaryTreeNode<int>* ret = tree.Find(3);
+	cout<<"Find 3?: "<<ret->_data<<endl;
+
+	ret = tree.Find(10);
+	cout<<"Find 10?: "<<ret<<endl;
+
+	cout<<"Height:"<<tree.Height()<<endl;
+
+	BinaryTree<int> treeCopy1 = tree;
+	treeCopy1.PrevOrder();
+
+	BinaryTree<int> treeCopy2;
+	treeCopy2 = tree;
+	treeCopy2.PrevOrder();
+}

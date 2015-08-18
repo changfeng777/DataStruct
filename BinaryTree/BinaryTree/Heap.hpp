@@ -25,6 +25,16 @@ public:
 		}
 	}
 
+	Heap(const vector<T>& vec)
+	{
+		_vec.swap(vec);
+
+		for (int i = _vec.size()/2 - 1; i >=0; --i)
+		{
+			_AdjustDown(_vec, i, _vec.size());
+		}
+	}
+
 	// 插入一个数据x到最小堆中
 	void Insert(const T& x)
 	{
@@ -112,6 +122,42 @@ public:
 		return _vec.empty();
 	}
 
+	size_t Size()
+	{
+		return _vec.size();
+	}
+
 private:
 	vector<T> _vec;
 };
+
+// 测试堆
+void TestHeap()
+{
+	Heap<int, greater<int>> heap;
+	heap.Insert(3);
+	heap.Insert(5);
+	heap.Insert(1);
+	heap.Insert(4);
+	heap.Insert(5);
+	heap.Insert(1);
+	heap.Insert(8);
+
+	while (!heap.Empty())
+	{
+		cout<<heap.GetHeapTop()<<" ";
+		heap.Remove();
+	}
+	cout<<endl;
+
+	//int array[10] = {9,1,3,5,6,7,8,0,2,4};
+	int array[10] = {10,16,18,12,11,13,15,17,14,19};
+	Heap<int> heap1(array, 10);
+
+	while (!heap1.Empty())
+	{
+		cout<<heap1.GetHeapTop()<<" ";
+		heap1.Remove();
+	}
+	cout<<endl;
+}

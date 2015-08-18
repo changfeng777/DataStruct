@@ -144,3 +144,16 @@ protected:
 private:
 	BinaryTreeNode_Thd<T>* _root;
 };
+
+
+// ²âÊÔÏßË÷»¯¶ş²æÊ÷
+void TestBinaryTreeThd()
+{
+	int array[20] = {1, 2, 3, '#', '#', 4, '#', '#', 5, 6};
+	BinaryTree_Thd<int> tree;
+	tree.CreateTree(array, 10);
+	tree.InOrder();
+
+	tree.InThreading();
+	tree.InOrderThreading();
+}
