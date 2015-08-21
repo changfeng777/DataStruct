@@ -7,6 +7,7 @@ using namespace std;
 #include "Heap.hpp"
 #include "RedPacket.hpp"
 #include "HuffmanTree.hpp"
+#include "FileCompress.hpp"
 
 int main()
 {
@@ -16,7 +17,8 @@ int main()
 	//TestHeap();
 	//TestRedPacket();
 
-	TestHuffmanTree_A();
+	//TestHuffmanTree_A();
+	TestCompress();
 
 	return 0;
 }

@@ -30,10 +30,29 @@ public:
 	{}
 	
 	~HuffmanTree_P()
-	{}
+	{
+		Destory(_root);
+	}
+
+	void Destory(HuffmanNode_P<T>*& root)
+	{
+		if (root)
+		{
+			Destory(root->_left);
+			Destory(root->_right);
+			
+			delete root;
+			root = NULL;
+		}
+	}
+
+	HuffmanNode_P<T>* GetRootNode()
+	{
+		return _root;
+	}
 
 public:
-	void CreateHuffmanTree(const T* array, size_t size)
+	void CreateHuffmanTree(const T* array, size_t size, const T& invalid)
 	{	
 		struct Compare 
 		{
@@ -47,9 +66,15 @@ public:
 		Heap<HuffmanNode_P<T>*, Compare> minHeap;
 		for (int i = 0; i < size; ++i)
 		{
-			HuffmanNode_P<T>* node = new HuffmanNode_P<T>(array[i]);
-			minHeap.Insert(node);
+			if (array[i] != invalid)
+			{
+				HuffmanNode_P<T>* node = new HuffmanNode_P<T>(array[i]);
+				minHeap.Insert(node);
+			}
 		}
+
+		if (minHeap.Empty())
+			return;
 
 		// 2.获取出最小和次小的节点做孩子节点，并构建这两个孩子节点的父节点进行链接。
 		HuffmanNode_P<T>* parent = minHeap.GetHeapTop();
@@ -84,7 +109,7 @@ public:
 		while (!q.empty())
 		{
 			HuffmanNode_P<T>* node = q.front();
-			cout<<node->_weight<<" ";
+			cout<<node->_weight<<"	";
 
 			if (node->_left)
 			{
@@ -97,6 +122,8 @@ public:
 			}
 			q.pop();
 		}
+
+		cout<<endl<<endl;
 	}
 
 private:
@@ -107,15 +134,15 @@ void TestHuffmanTree_P()
 {
 	int ar[10] = {2, 3, 6, 0 ,4, 5, 1, 9, 7, 8};
 	HuffmanTree_P<int> tree;
-	tree.CreateHuffmanTree(ar, 10);
+	tree.CreateHuffmanTree(ar, 10, -1);
 	tree.LevelOrder();
 }
 
 
 //////////////////////////////////////////////////////////////////
 // 静态存储结构
-
-typedef unsigned int IndexType;
+	
+typedef int IndexType;
 
 template<class T>
 struct HuffmanNode_A
@@ -128,9 +155,9 @@ struct HuffmanNode_A
 
 	HuffmanNode_A(const T& weight)
 		:_weight(weight)
-		,_left(0)
-		,_right(0)
-		,_parent(0)
+		,_left(-1)
+		,_right(-1)
+		,_parent(-1)
 	{}
 };
 
@@ -148,6 +175,7 @@ public:
 			}
 		};
 
+		// 将节点的指针放入最小堆中，重写比较器
 		_vNodes.reserve(size*2 - 1);
 		Heap<HuffmanNode_A<T>*, Compare> minHeap;
 		size_t index = 0;
