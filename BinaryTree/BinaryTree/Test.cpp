@@ -1,6 +1,9 @@
 #include <iostream>
 using namespace std;
 
+#pragma warning (disable:4996)
+#pragma warning (disable:4018)
+
 #include "BinaryTree.hpp"
 #include "BinaryTreeTopic.hpp"
 #include "BinaryTreeThreading.hpp"
@@ -8,6 +11,7 @@ using namespace std;
 #include "RedPacket.hpp"
 #include "HuffmanTree.hpp"
 #include "FileCompress.hpp"
+#include "BinarySearchTree.hpp"
 
 int main()
 {
@@ -18,7 +22,9 @@ int main()
 	//TestRedPacket();
 
 	//TestHuffmanTree_A();
-	TestCompress();
+	//TestCompress();
+
+	TestBSTree();
 
 	return 0;
 }
