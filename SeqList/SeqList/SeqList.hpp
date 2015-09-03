@@ -8,15 +8,17 @@ public:
 		:_data(0)
 		,_size(0)
 		,_capacity(0)
-		,_storeSize(3)
-	{}
+	{
+		_CheckExpand(7);
+	}
 
 	SeqList (const SeqList& v)
 		:_size(v._size)
 		,_capacity(v._capacity)
-		,_storeSize(v._storeSize)
 	{
 		_data = new T[_capacity];
+
+		// 此处需要类型萃取后进行处理，对自动义类型进行依次的拷贝
 		memcpy(_data, v._data, sizeof(_size)*_size);
 	}
 
@@ -28,14 +30,11 @@ public:
 	//		_size = v._size;
 	//		_capacity = v._capacity;
 	//		_data = new T[_capacity];
-	//		memcpy(_data, v._data, sizeof(_size)*_size);*/
-
-	//		SeqList tmp(v);
-	//		std::swap(_data, tmp._data);
-	//		std::swap(_capacity, tmp._capacity);
-	//		std::swap(_size, tmp._size);
+	//
+	//		// 此处需要类型萃取后进行处理，对自动义类型进行依次的拷贝
+	//		memcpy(_data, v._data, sizeof(_size)*_size);
 	//	}
-
+	//	*/
 	//	return *this;
 	//}
 
@@ -58,16 +57,16 @@ public:
 	}
 
 protected:
-	 inline void _CheckExpand()
+	 inline void _CheckExpand(size_t size)
 	 {
 		 if (_size < _capacity)
 			 return;
 
-		 _capacity = _capacity * 2 + _storeSize;
+		 _capacity = size;
 		 T* tmp = new T[_capacity];
-		
 		 if (_data)
 		 {
+			 // 此处需进行萃取以后再处理
 			 memcpy(tmp, _data, sizeof(T)*_size);
 			 delete [] _data;
 		 }
@@ -87,9 +86,19 @@ protected:
 	 }
 
 public:
+	// size > capacity 时，将顺序表的容量增加到size
+	void Reserve(size_t size)
+	{
+		_CheckExpand(size);
+	}
+
 	void PushBack (const T& x)
 	{
-		_CheckExpand();
+		if (_capacity ==_size)
+		{
+			_CheckExpand(2*_capacity);
+		}
+
 		_data[_size++] = x;
 	}
 
@@ -99,30 +108,33 @@ public:
 			--_size;
 	}
 
-	// 在position位置上插入一个数据
-	void Insert (size_t position, const T& x)
+	// 在pos位置上插入一个数据
+	void Insert (size_t pos, const T& x)
 	{
-		assert (position <= _size);
+		assert (pos <= _size);
 
-		_CheckExpand();
+		if (_capacity ==_size)
+		{
+			_CheckExpand(2*_capacity);
+		}
 
 		size_t last = _size;
-		while (position < last)
+		while (pos < last)
 		{
 			_data[last] = _data[last - 1];
 			--last;
 		}
 
-		_data[position] = x;
+		_data[pos] = x;
 		++_size;
 	}
 
-	void Earse (size_t position)
+	void Earse (size_t pos)
 	{
-		assert(position < _size);
+		assert(pos < _size);
 
 		// 注意这里的边界条件
-		size_t begin = position;
+		size_t begin = pos;
 		while (begin < _size - 1)
 		{
 			_data[begin] = _data[begin + 1];
@@ -132,11 +144,11 @@ public:
 		--_size;
 	}
 
-	T& operator[](size_t position)
+	T& operator[](size_t pos)
 	{
-		assert (position < _size);
+		assert (pos < _size);
 
-		return _data[position];
+		return _data[pos];
 	}
 
 	void Clear ()
@@ -163,5 +175,4 @@ private:
 	T*			_data;			// 数据块指针
 	size_t		_size;			// 数据的个数
 	size_t		_capacity;		// 容量
-	const int	_storeSize;		// 存储大小（初始化的容量值） 
 };
