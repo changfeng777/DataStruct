@@ -36,18 +36,19 @@ public:
 		Clear();
 	}
 
-	List(const List& l)
+	List(List<T>& l)
 		:_head(NULL)
 		,_tail(NULL)
 	{
-		Node<T>* begin = _head;
+		Node<T>* begin = l._head;
 		while (begin)
 		{
-			l.PushBack(begin->_data);
+			PushBack(begin->_data);
+			begin = begin->_next;
 		}
 	}
 
-	void Swap(List& l)
+	void Swap(List<T>& l)
 	{
 		swap(_head, l._head);
 		swap(_tail, l._tail);
@@ -56,6 +57,8 @@ public:
 	List& operator=(List l)
 	{
 		Swap(l);
+
+		return *this;
 	}
 
 public:
