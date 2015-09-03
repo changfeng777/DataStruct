@@ -36,6 +36,28 @@ public:
 		Clear();
 	}
 
+	List(const List& l)
+		:_head(NULL)
+		,_tail(NULL)
+	{
+		Node<T>* begin = _head;
+		while (begin)
+		{
+			l.PushBack(begin->_data);
+		}
+	}
+
+	void Swap(List& l)
+	{
+		swap(_head, l._head);
+		swap(_tail, l._tail);
+	}
+
+	List& operator=(List l)
+	{
+		Swap(l);
+	}
+
 public:
 	// Í·²å/Í·É¾/Î²²å/Î²É¾
 	void PushBack(const T& x);
@@ -221,8 +243,6 @@ void List<T>::Reverse()
 	}
 
 	Node<T>* newHead = _head;
-	Node<T>* newTail = _head;
-
 	Node<T>* begin = _head->_next;
 	while(begin)
 	{
@@ -234,12 +254,13 @@ void List<T>::Reverse()
 		newHead = tmp;
 	}
 
-	newTail->_next = NULL;
-	newHead->_prev = NULL;
-
+	_tail = _head;
 	_head = newHead;
-	_tail = newTail;
+
+	_head->_prev = NULL;
+	_tail->_next = NULL;
 }
+
 
 template<class T>
 void List<T>::Clear()
