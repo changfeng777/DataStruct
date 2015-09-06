@@ -299,7 +299,7 @@ namespace SECOND_DETECT
 		size_t HashFunc2(size_t last, size_t i)
 		{
 			size_t ret = last + (2*i - 1)%_capaciy;
-			if (ret > _capaciy)
+			if (ret >= _capaciy)
 				ret %= _capaciy;
 
 			return ret;
@@ -324,6 +324,9 @@ namespace SECOND_DETECT
 		ht1.Insert(22);
 		ht1.Insert(23);
 		ht1.Insert(24);
+
+		ht1.Print();
+
 		ht1.Insert(25);
 		ht1.Print();
 
