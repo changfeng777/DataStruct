@@ -1,8 +1,13 @@
 #pragma once
 
 #include<assert.h>
+#include "Heap.hpp"
+#include "UnionFindSet.hpp"
 
+//
 // 临接矩阵表示无向图&有向图
+//
+
 template<class V, class W>
 class GraphMatrix
 {
@@ -59,7 +64,7 @@ public:
 		{
 			cout<<_vertexs[i]<<" ";
 		}
-		cout<<endl<<endl;
+		cout<<endl<<endl; 
 
 		for (int i = 0; i < _vertexSize; ++i)
 		{
@@ -107,16 +112,21 @@ void Test2()
 	g.Display();
 }
 
+//
+// 临接表
+//
 
 template<class V, class W>
 struct LinkEdge
 {
-	int _index;				// 顶点下标
+	int _srcIndex;			// 源顶点下标
+	int _dstIndex;			// 目标顶点下标
 	W _weight;				// 权重
 	LinkEdge<V, W>* _next;	// 指向下一个节点的指针 
 
-	LinkEdge(int index = -1, const W& weight = W())
-		:_index(index)
+	LinkEdge(int srcIndex = -1, int dstIndex = -1, const W& weight = W())
+		:_srcIndex(srcIndex)
+		,_dstIndex(dstIndex)
 		,_weight(weight)
 		,_next(NULL)
 	{}
@@ -132,6 +142,15 @@ struct LinkVertex
 		:_vertex(vertex)
 		,_head(NULL)
 	{}
+};
+
+template<class V, class W>
+struct CompareLinkEdge
+{
+	bool operator()(LinkEdge<V, W>* lhs, LinkEdge<V, W>* rhs)
+	{
+		return lhs->_weight < rhs->_weight;
+	}
 };
 
 template<class V, class W>
@@ -173,7 +192,7 @@ public:
 	void _AddEdge(int srcIndex, int dstIndex, const W& weight)
 	{
 		LinkEdge<V, W>* head = _linkTable[srcIndex]._head;
-		LinkEdge<V, W>* tmp = new LinkEdge<V, W>(dstIndex, weight);
+		LinkEdge<V, W>* tmp = new LinkEdge<V, W>(srcIndex, dstIndex, weight);
 
 		tmp->_next = head;
 		_linkTable[srcIndex]._head = tmp;
@@ -203,7 +222,7 @@ public:
 			LinkEdge<V, W>* begin = _linkTable[i]._head;
 			while (begin)
 			{
-				cout<<begin->_weight<<"["<<begin->_index<<"]""->";
+				cout<<begin->_weight<<"["<<begin->_dstIndex<<"]""->";
 				begin = begin->_next;
 			}
 
@@ -211,6 +230,110 @@ public:
 		}
 
 		cout<<endl;
+	}
+
+	void DFS(int cur)
+	{
+		bool* visited = new bool[_vertexSize];
+		memset(visited, false, sizeof(bool)*_vertexSize);
+
+		_DFS(cur, visited);
+
+		delete[] visited;
+	}
+
+	void _DFS(int cur, bool* visited)
+	{
+		// 1.访问当前节点
+		cout<<_linkTable[cur]._vertex<<" ";
+		visited[cur] = true;
+
+		// 2.获取当前临接表的第一个顶点
+		int next = -1;
+		if (_linkTable[cur]._head)
+			next = _linkTable[cur]._head->_dstIndex;
+
+		// 3.依次获取临接表后面的顶点进行深度优先遍历
+		while (next != -1)
+		{
+			if (visited[next] == false)
+			{
+				_DFS(next, visited);
+			}
+
+			// 4.查找当前顶点的下一个顶点
+			LinkEdge<V,W>* edge = _linkTable[cur]._head;
+			while (edge)
+			{
+				if (edge->_dstIndex == next)
+				{
+					if (edge->_next)
+						next = edge->_next->_dstIndex;
+					else
+						next = -1;
+
+					break;
+				}
+				edge = edge->_next;
+			}
+
+			if (edge == NULL)
+			{
+				next = -1;
+			}
+		}
+	}
+
+	bool Kruskal(GraphLink& minSpanTree)
+	{
+		// 初始化最小生成树
+		minSpanTree._linkTable = new LinkVertex<V, W>[_vertexSize];
+		minSpanTree._vertexSize = _vertexSize;
+		for (int i = 0; i < _vertexSize; ++i)
+		{
+			minSpanTree._linkTable[i]._vertex = _linkTable[i]._vertex;
+		}
+
+		// 将所有的边放到一个最小堆
+		Heap<LinkEdge<V,W>*, CompareLinkEdge<V,W>> minHeap;
+		for (int i = 0; i < _vertexSize; ++i)
+		{
+			LinkEdge<V, W>* begin = _linkTable[i]._head;
+			while (begin)
+			{
+				// 无向图的边需要进行过滤
+				if (begin->_srcIndex < begin->_dstIndex)
+				{
+					minHeap.Insert(begin);
+				}
+
+				begin = begin->_next;
+			}
+		}
+		
+		// 使用并差集和最小堆构建最小生成树
+		UnionFindSet UFSet(_vertexSize);
+		int count = _vertexSize;
+		while (--count)
+		{
+			if (minHeap.Empty())
+			{
+				return false;
+			}
+
+			LinkEdge<V,W>* edge = minHeap.GetHeapTop();
+			minHeap.Remove();
+			int src = UFSet.Find(edge->_srcIndex);
+			int dst = UFSet.Find(edge->_dstIndex);
+
+			if(src != dst)
+			{
+				UFSet.Union(src, dst);
+				minSpanTree._AddEdge(edge->_srcIndex, edge->_dstIndex, edge->_weight);
+			}
+		}
+
+		return true;
 	}
 
 protected:
@@ -230,6 +353,14 @@ void Test3()
 	g.AddEdge('C', 'E', 40);
 
 	g.Display();
+
+	// 生成最小生成树
+	GraphLink<char, int> minSpanTree;
+	g.Kruskal(minSpanTree);
+
+	minSpanTree.Display();
+
+	g.DFS(0);
 }
 
 // 有向图
