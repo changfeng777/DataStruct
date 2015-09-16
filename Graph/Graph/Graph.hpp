@@ -1,6 +1,7 @@
 #pragma once
 
 #include<assert.h>
+#include <queue>
 #include "Heap.hpp"
 #include "UnionFindSet.hpp"
 
@@ -232,14 +233,44 @@ public:
 		cout<<endl;
 	}
 
+	int _GetFirstVertex(int cur)
+	{
+		if (_linkTable[cur]._head)
+			return _linkTable[cur]._head->_dstIndex;
+		else
+			return -1;
+	}
+
+	int _GetNextVertex(int cur, int next)
+	{
+		LinkEdge<V,W>* edge = _linkTable[cur]._head;
+		while (edge)
+		{
+			if (edge->_dstIndex == next)
+			{
+				if (edge->_next)
+					return edge->_next->_dstIndex;
+
+				break;
+			}
+			edge = edge->_next;
+		}
+
+		return -1;
+	}
+
 	void DFS(int cur)
 	{
+		cout<<"DFS:";
+
 		bool* visited = new bool[_vertexSize];
 		memset(visited, false, sizeof(bool)*_vertexSize);
 
 		_DFS(cur, visited);
 
 		delete[] visited;
+
+		cout<<endl;
 	}
 
 	void _DFS(int cur, bool* visited)
@@ -249,9 +280,7 @@ public:
 		visited[cur] = true;
 
 		// 2.获取当前临接表的第一个顶点
-		int next = -1;
-		if (_linkTable[cur]._head)
-			next = _linkTable[cur]._head->_dstIndex;
+		int next = _GetFirstVertex(cur);
 
 		// 3.依次获取临接表后面的顶点进行深度优先遍历
 		while (next != -1)
@@ -262,31 +291,53 @@ public:
 			}
 
 			// 4.查找当前顶点的下一个顶点
-			LinkEdge<V,W>* edge = _linkTable[cur]._head;
-			while (edge)
+			next = _GetNextVertex(cur, next);
+		}
+	}
+
+	void BFS(int cur)
+	{
+		cout<<"BFS:";
+		bool* visited = new bool[_vertexSize];
+		memset(visited, false, sizeof(bool)*_vertexSize);
+
+		_BFS(cur, visited);
+
+		delete[] visited;
+
+		cout<<endl;
+	}
+	
+	void _BFS(int cur, bool* visited)
+	{
+		cout<<_linkTable[cur]._vertex<<" ";
+		visited[cur] = true;
+
+		queue<int> q;
+		q.push(cur);
+		while (!q.empty())
+		{
+			cur = q.front();
+			q.pop();
+
+			int next = _GetFirstVertex(cur);
+			while (next != -1)
 			{
-				if (edge->_dstIndex == next)
+				if (visited[next] == false)
 				{
-					if (edge->_next)
-						next = edge->_next->_dstIndex;
-					else
-						next = -1;
-
-					break;
+					cout<<_linkTable[next]._vertex<<" ";
+					visited[next] = true;
+					q.push(next);
 				}
-				edge = edge->_next;
-			}
 
-			if (edge == NULL)
-			{
-				next = -1;
+				next = _GetNextVertex(cur, next);
 			}
 		}
 	}
 
 	bool Kruskal(GraphLink& minSpanTree)
 	{
-		// 初始化最小生成树
+		// 1.初始化最小生成树
 		minSpanTree._linkTable = new LinkVertex<V, W>[_vertexSize];
 		minSpanTree._vertexSize = _vertexSize;
 		for (int i = 0; i < _vertexSize; ++i)
@@ -294,7 +345,7 @@ public:
 			minSpanTree._linkTable[i]._vertex = _linkTable[i]._vertex;
 		}
 
-		// 将所有的边放到一个最小堆
+		// 2.将所有的边放到一个最小堆
 		Heap<LinkEdge<V,W>*, CompareLinkEdge<V,W>> minHeap;
 		for (int i = 0; i < _vertexSize; ++i)
 		{
@@ -311,7 +362,7 @@ public:
 			}
 		}
 		
-		// 使用并差集和最小堆构建最小生成树
+		// 3.使用并差集和最小堆构建最小生成树
 		UnionFindSet UFSet(_vertexSize);
 		int count = _vertexSize;
 		while (--count)
@@ -351,7 +402,6 @@ void Test3()
 	g.AddEdge('B', 'D', 20);
 	g.AddEdge('B', 'E', 30);
 	g.AddEdge('C', 'E', 40);
-
 	g.Display();
 
 	// 生成最小生成树
@@ -359,8 +409,8 @@ void Test3()
 	g.Kruskal(minSpanTree);
 
 	minSpanTree.Display();
-
 	g.DFS(0);
+	g.BFS(0);
 }
 
 // 有向图
