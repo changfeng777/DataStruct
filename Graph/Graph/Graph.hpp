@@ -233,30 +233,24 @@ public:
 		cout<<endl;
 	}
 
-	int _GetFirstVertex(int cur)
+	LinkEdge<V,W>* _GetFirstEdge(int src)
 	{
-		if (_linkTable[cur]._head)
-			return _linkTable[cur]._head->_dstIndex;
-		else
-			return -1;
+		return _linkTable[src]._head;
 	}
 
-	int _GetNextVertex(int cur, int next)
+	LinkEdge<V,W>* _GetNextEdge(int src, int next)
 	{
-		LinkEdge<V,W>* edge = _linkTable[cur]._head;
+		LinkEdge<V,W>* edge = _linkTable[src]._head;
 		while (edge)
 		{
 			if (edge->_dstIndex == next)
 			{
-				if (edge->_next)
-					return edge->_next->_dstIndex;
-
-				break;
+				return edge->_next;
 			}
 			edge = edge->_next;
 		}
 
-		return -1;
+		return NULL;
 	}
 
 	void DFS(int cur)
@@ -273,25 +267,28 @@ public:
 		cout<<endl;
 	}
 
-	void _DFS(int cur, bool* visited)
+	void _DFS(int src, bool* visited)
 	{
 		// 1.访问当前节点
-		cout<<_linkTable[cur]._vertex<<" ";
-		visited[cur] = true;
+		//cout<<_linkTable[src]._vertex<<" ";
+		visited[src] = true;
 
 		// 2.获取当前临接表的第一个顶点
-		int next = _GetFirstVertex(cur);
+		LinkEdge<V,W>* edge = _GetFirstEdge(src);
 
 		// 3.依次获取临接表后面的顶点进行深度优先遍历
-		while (next != -1)
+		while (edge)
 		{
-			if (visited[next] == false)
+			if (visited[edge->_dstIndex] == false)
 			{
-				_DFS(next, visited);
+				cout<<_linkTable[edge->_srcIndex]._vertex<<"->"
+					<<_linkTable[edge->_dstIndex]._vertex<<" ";
+
+				_DFS(edge->_dstIndex, visited);
 			}
 
 			// 4.查找当前顶点的下一个顶点
-			next = _GetNextVertex(cur, next);
+			edge = _GetNextEdge(src, edge->_dstIndex);
 		}
 	}
 
@@ -310,7 +307,7 @@ public:
 	
 	void _BFS(int cur, bool* visited)
 	{
-		cout<<_linkTable[cur]._vertex<<" ";
+		//cout<<_linkTable[cur]._vertex<<" ";
 		visited[cur] = true;
 
 		queue<int> q;
@@ -320,17 +317,20 @@ public:
 			cur = q.front();
 			q.pop();
 
-			int next = _GetFirstVertex(cur);
-			while (next != -1)
+			LinkEdge<V,W>* edge = _GetFirstEdge(cur);
+			while (edge)
 			{
-				if (visited[next] == false)
+				if (visited[edge->_dstIndex] == false)
 				{
-					cout<<_linkTable[next]._vertex<<" ";
-					visited[next] = true;
-					q.push(next);
+					//cout<<_linkTable[edge->_dstIndex]._vertex<<" ";
+					cout<<_linkTable[edge->_srcIndex]._vertex<<"->"
+						<<_linkTable[edge->_dstIndex]._vertex<<" ";
+
+					visited[edge->_dstIndex] = true;
+					q.push(edge->_dstIndex);
 				}
 
-				next = _GetNextVertex(cur, next);
+				edge = _GetNextEdge(cur, edge->_dstIndex);
 			}
 		}
 	}
@@ -387,6 +387,58 @@ public:
 		return true;
 	}
 
+	bool Prim(GraphLink& minSpanTree)
+	{
+		// 1.初始化最小生成树
+		minSpanTree._linkTable = new LinkVertex<V, W>[_vertexSize];
+		minSpanTree._vertexSize = _vertexSize;
+		for (int i = 0; i < _vertexSize; ++i)
+		{
+			minSpanTree._linkTable[i]._vertex = _linkTable[i]._vertex;
+		}
+
+		bool* visitedSet = new bool[_vertexSize];
+		memset(visitedSet, false, sizeof(bool)*_vertexSize);
+
+		int src = 0;
+		visitedSet[src] = true;
+		Heap<LinkEdge<V,W>*, CompareLinkEdge<V,W>> minHeap;
+
+		int count = 1;
+		do 
+		{
+			// 2.取出一个顶点所有未访问过的临接边放到一个最小堆里面
+			LinkEdge<V, W>* edge = _GetFirstEdge(src);
+			while(edge)
+			{
+				if (visitedSet[edge->_dstIndex] == false)
+				{
+					minHeap.Insert(edge);
+				}
+
+				edge = _GetNextEdge(src, edge->_dstIndex);
+			}
+
+			// 2.选出堆中最小的边加入生成树
+			while(!minHeap.Empty() && count < _vertexSize)
+			{
+				edge = minHeap.GetHeapTop();
+				minHeap.Remove();
+				if (visitedSet[edge->_dstIndex] == false)
+				{
+					minSpanTree._AddEdge(edge->_srcIndex, edge->_dstIndex,edge->_weight);
+					visitedSet[edge->_dstIndex] = true;
+					src = edge->_dstIndex;
+					++count;
+
+					break;
+				}  
+			}
+		}while (count < _vertexSize);
+
+		return true;
+	}
+
 protected:
 	LinkVertex<V, W>* _linkTable;	// 临接表
 	int _vertexSize;				// 顶点个数
@@ -405,10 +457,16 @@ void Test3()
 	g.Display();
 
 	// 生成最小生成树
-	GraphLink<char, int> minSpanTree;
-	g.Kruskal(minSpanTree);
+	GraphLink<char, int> minSpanTree1;
+	g.Kruskal(minSpanTree1);
 
-	minSpanTree.Display();
+	minSpanTree1.Display();
+
+	// 生成最小生成树
+	GraphLink<char, int> minSpanTree2;
+	g.Prim(minSpanTree2);
+	minSpanTree2.Display();
+
 	g.DFS(0);
 	g.BFS(0);
 }
