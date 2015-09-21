@@ -1,6 +1,6 @@
 #pragma once
 
-#include<assert.h>
+#include <assert.h>
 #include <queue>
 #include "Heap.hpp"
 #include "UnionFindSet.hpp"
@@ -158,13 +158,15 @@ template<class V, class W>
 class GraphLink
 {
 public:
-	GraphLink()
+	GraphLink(bool isDigraph = false)
 		:_linkTable(0)
 		,_vertexSize(0)
+		,_isDigraph(isDigraph)
 	{}
 
-	GraphLink(const V* ar, int size)
+	GraphLink(const V* ar, int size, bool isDigraph = false)
 		:_vertexSize(size)
+		,_isDigraph(isDigraph)
 	{
 		_linkTable = new LinkVertex<V, W>[size];
 		for (int i = 0; i < size; ++i)
@@ -208,11 +210,15 @@ public:
 		assert(dstIndex != -1);
 
 		// 无向图
-		_AddEdge(srcIndex, dstIndex, weight);
-		_AddEdge(dstIndex, srcIndex, weight);
-
-		// 有向图
-		//_AddEdge(srcIndex, dstIndex, weight);
+		if(_isDigraph)
+		{
+			_AddEdge(srcIndex, dstIndex, weight);
+		}
+		else
+		{
+			_AddEdge(srcIndex, dstIndex, weight);
+			_AddEdge(dstIndex, srcIndex, weight);
+		}
 	}
 
 	void Display()
@@ -345,7 +351,10 @@ public:
 			minSpanTree._linkTable[i]._vertex = _linkTable[i]._vertex;
 		}
 
+		//
 		// 2.将所有的边放到一个最小堆
+		// 假设有V个顶点，E条边
+		// 
 		Heap<LinkEdge<V,W>*, CompareLinkEdge<V,W>> minHeap;
 		for (int i = 0; i < _vertexSize; ++i)
 		{
@@ -439,15 +448,199 @@ public:
 		return true;
 	}
 
+	W _GetWeight(int src, int dst, const W& maxValue)
+	{
+		LinkEdge<V,W>* edge = _linkTable[src]._head;
+		while (edge)
+		{
+			if (edge->_dstIndex == dst)
+			{
+				return edge->_weight;
+			}
+
+			edge = edge->_next;
+		}
+
+		return maxValue;
+	}
+
+	// 非负单源最短路径--Dijkstra(迪科斯彻)
+	// 求src到其他顶点的最短路径
+
+	void _Dijkstra(int src, W* dist, int* path, bool* vSet, int size, const W& maxValue)
+	{
+		//
+		// 1.dist初始化src到其他顶点的的距离
+		// 2.path初始化src到其他顶点的路径
+		// 3.初始化顶点集合
+		//
+		for (int i = 0; i < size; ++i)
+		{
+			dist[i] = _GetWeight(src, i, maxValue);
+			path[i] = src;
+			vSet[i] = false;
+		}
+
+		// 将src加入集合
+		vSet[src] = true;
+
+		int count = size;
+		while(count--)
+		{
+			//
+			// 选出与src顶点连接的边中最小的边
+			// src->min
+			W min = maxValue;
+			int minIndex = src;
+			for (int j = 0; j < size; ++j)
+			{
+				if (vSet[j] == false && dist[j] < min)
+				{
+					minIndex = j;
+					min = dist[j];
+				}
+			}
+
+			vSet[minIndex] = true;
+			for (int k = 0; k < size; ++k)
+			{
+				// 
+				// 如果dist(src->min)+dist(min, k)的权值小于dist(src, k)
+				// 则更新dist(src,k)和path(src->min->k)
+				//
+				W w = _GetWeight(minIndex, k, maxValue);
+				if (vSet[k] == false && dist[minIndex] + w < dist[k])
+				{
+					dist[k] = dist[minIndex] + w;
+					path[k] = minIndex;
+				}
+			}
+		}
+	}
+
+	void _Dijkstra_OP(int src, W* dist, int* path,
+		bool* vSet, int size, const W& maxValue)
+	{
+		//
+		// 1.dist初始化src到其他顶点的的距离
+		// 2.path初始化src到其他顶点的路径
+		// 3.初始化顶点集合
+		//
+		for (int i = 0; i < size; ++i)
+		{
+			dist[i] = _GetWeight(src, i, maxValue);
+			path[i] = src;
+			vSet[i] = false;
+		}
+
+		struct Compare
+		{
+			bool operator()(const pair<W, int>& lhs, const pair<W, int>& rhs)
+			{
+				return lhs.first < rhs.first;
+			}
+		};
+
+		Heap<pair<W, int>, Compare> minHeap;
+		for (int i = 0; i < size; ++i)
+		{
+			if (dist[i] < maxValue)
+			{
+				minHeap.Insert(make_pair(dist[i], i));
+			}
+		}
+
+		// 将src加入集合
+		vSet[src] = true;
+
+		int count = size;
+		while(count--)
+		{
+			//
+			// 选出与src顶点连接的边中最小的边
+			// src->min
+
+			if (minHeap.Empty())
+				continue;
+
+			int minIndex = minHeap.GetHeapTop().second;
+			minHeap.Remove();
+
+			vSet[minIndex] = true;
+			for (int k = 0; k < size; ++k)
+			{
+				// 
+				// 如果dist(src->min)+dist(min, k)的权值小于dist(src, k)
+				// 则更新dist(src,k)和path(src->min->k)
+				//
+				W w = _GetWeight(minIndex, k, maxValue);
+				if (vSet[k] == false && dist[minIndex] + w < dist[k])
+				{
+					dist[k] = dist[minIndex] + w;
+					path[k] = minIndex;
+
+					minHeap.Insert(make_pair(dist[k], k));
+				}
+			}
+		}
+	}
+
+	void PrintPath(int src, W* dist, int* path, int size)
+	{
+		int* vPath = new int[size];
+		for (int i = 0; i < size; ++i)
+		{
+			if (i != src)
+			{
+				int index = i, count = 0;
+				do{
+					vPath[count++] = index;
+					index = path[index];
+				}while (index != src);
+
+				vPath[count++] = src;
+
+				//cout<<"顶点："<<_linkTable[src]._vertex\
+				<<"->顶点："<<_linkTable[i]._vertex<<"的路径为：";
+				cout<<src<<","<<i<<"的路径为:";
+				while(count)
+				{
+					//cout<<_linkTable[ vSet[--count] ]._vertex<<"->";
+					cout<<vPath[--count]<<"->";
+				}
+
+				cout<<"路径长度为："<<dist[i]<<endl;
+			}
+		}
+	}
+
+	void Dijkstra(int src, const W& maxValue)
+	{
+		W* dist = new W[_vertexSize];
+		int* path = new int[_vertexSize];
+		bool* vSet = new bool[_vertexSize];
+
+		//_Dijkstra(src, dist, path, vSet, _vertexSize, maxValue);
+		_Dijkstra_OP(src, dist, path, vSet, _vertexSize, maxValue);
+
+		// 打印最短路径
+		PrintPath(src, dist, path, _vertexSize);
+
+		delete[] dist;
+		delete[] path;
+		delete[] vSet;
+	}
+
 protected:
 	LinkVertex<V, W>* _linkTable;	// 临接表
 	int _vertexSize;				// 顶点个数
+	bool _isDigraph;				// 是否是有向图
 };
 
 // 无向图
 void Test3()
 {
-	GraphLink<char, int> g("ABCDE", 5);
+	GraphLink<char, int> g("ABCDE", 5, false);
 	g.AddEdge('A', 'D', 10);
 	g.AddEdge('A', 'E', 20);
 	g.AddEdge('B', 'C', 10);
@@ -457,13 +650,13 @@ void Test3()
 	g.Display();
 
 	// 生成最小生成树
-	GraphLink<char, int> minSpanTree1;
+	GraphLink<char, int> minSpanTree1(false);
 	g.Kruskal(minSpanTree1);
 
 	minSpanTree1.Display();
 
 	// 生成最小生成树
-	GraphLink<char, int> minSpanTree2;
+	GraphLink<char, int> minSpanTree2(false);
 	g.Prim(minSpanTree2);
 	minSpanTree2.Display();
 
@@ -474,7 +667,7 @@ void Test3()
 // 有向图
 void Test4()
 {
-	GraphLink<char, int> g("ABCDE", 5);
+	GraphLink<char, int> g("ABCDE", 5, true);
 	g.AddEdge('A', 'D', 10);
 	g.AddEdge('E', 'A', 20);
 	g.AddEdge('B', 'C', 10);
@@ -483,4 +676,6 @@ void Test4()
 	g.AddEdge('C', 'E', 40);
 
 	g.Display();
+
+	g.Dijkstra(0, 10000);
 }
