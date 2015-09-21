@@ -675,6 +675,9 @@ void Test4()
 	g.AddEdge('E', 'B', 30);
 	g.AddEdge('C', 'E', 40);
 
+	g.AddEdge('A', 'C', 50);
+	g.AddEdge('A', 'E', 50);
+
 	g.Display();
 
 	g.Dijkstra(0, 10000);
