@@ -275,5 +275,3 @@ Tag Erase(SeqList* pSeq, DataType x, Tag all)
 
 	return success;
 }
-
-//////////////////////////////////////////////////////////////

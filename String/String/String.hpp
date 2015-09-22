@@ -39,6 +39,7 @@ public:
 		swap(_size, s._size);
 	}
 
+	// 深拷贝的优化实现
 	String(const String& s)
 		:_str(NULL)
 	{
@@ -46,6 +47,7 @@ public:
 		Swap(tmp);
 	}
 
+	// 深拷贝的优化实现
 	String& operator=(String s)
 	{
 		this->Swap(s);
