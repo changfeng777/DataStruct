@@ -19,11 +19,11 @@ template <class Category, class T, class Distance = ptrdiff_t,
 class Pointer = T*, class Reference = T&>
 struct Iterator
 {
-	typedef Category  IteratorCategory;
-	typedef T         ValueType;
-	typedef Distance  DifferenceType;
-	typedef Pointer   Pointer;
-	typedef Reference Reference;
+	typedef Category  IteratorCategory;		// 迭代器类型
+	typedef T         ValueType;			// 迭代器所指对象类型
+	typedef Distance  DifferenceType;		// 两个迭代器之间的距离
+	typedef Pointer   Pointer;				// 迭代器所指对象类型的指针
+	typedef Reference Reference;			// 迭代器所指对象类型的引用
 };
 
 //

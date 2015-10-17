@@ -27,7 +27,10 @@ class __ListIterator
 public:
 	typedef __ListIterator<T> Iterator;
 
+	// List是个双向链表，所以它的迭代器是一个双向迭代器类型
+	typedef BidirectionalIteratorTag IteratorCategory;
 	typedef T ValueType;
+	typedef ptrdiff_t  DifferenceType;
 	typedef T* Pointer;
 	typedef T& Reference;
 	typedef __ListNode<T>* LinkType;
@@ -184,3 +187,39 @@ private:
 	//
 	__ListNode<T> _head;	
 };
+
+// 1.测试List迭代器
+void PrintList(List<int>& l1)
+{
+	List<int>::Iterator it = l1.Begin();
+	for (; it != l1.End(); ++it)
+	{
+		cout<<*it<<" ";
+	}
+	cout<<endl;
+}
+
+void Test1()
+{
+	List<int> l1;
+	l1.PushBack(1);
+	l1.PushBack(2);
+	l1.PushBack(3);
+	l1.PushBack(4);
+	l1.PushBack(5);
+	l1.PushBack(6);
+	l1.PushBack(7);
+	l1.PushBack(8);
+	PrintList(l1);
+
+	// 迭代器失效
+	List<int>::Iterator it = l1.Begin();
+	while(it != l1.End())
+	{
+		if (*it % 2 == 0)
+			it = l1.Erase(it);
+		else
+			++it;
+	}
+	PrintList(l1);	
+}

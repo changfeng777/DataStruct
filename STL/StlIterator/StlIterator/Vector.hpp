@@ -6,9 +6,16 @@ class Vector
 {
 public:
 	typedef T ValueType;
+	typedef ptrdiff_t  DifferenceType;
 	typedef ValueType* Pointer;
-	typedef ValueType* Iterator;
 	typedef ValueType& Reference;
+
+	//
+	// Vector的迭代器是一个原生指针，所以是是一个随机迭代器类型
+	// 是通过特化 struct IteratorTraits<T*>的方式定义的
+	//
+	typedef ValueType* Iterator;
+
 
 	Iterator Begin() { return _start; }
 	Iterator End() { return _finish; }
@@ -82,3 +89,40 @@ private:
 	Iterator _finish;		// 指向有效数据的尾
 	Iterator _endOfStorage; // 指向存储容量的尾
 };
+
+// 测试Vector迭代器的使用
+void PrintVector(Vector<int>& v)
+{
+	Vector<int>::Iterator it = v.Begin();
+	for (; it != v.End(); ++it)
+	{
+		cout<<*it<<" ";
+	}
+	cout<<endl;
+}
+
+void Test2()
+{
+	Vector<int> v1;
+	v1.PushBack(1);
+	v1.PushBack(2);
+	v1.PushBack(3);
+	v1.PushBack(4);
+	v1.PushBack(5);
+	v1.PushBack(6);
+	v1.PushBack(7);
+	v1.PushBack(8);
+
+	PrintVector(v1);
+
+	// 迭代器失效
+	Vector<int>::Iterator it = v1.Begin();
+	while(it != v1.End())
+	{
+		if (*it % 2 == 0)
+			it = v1.Erase(it);
+		else
+			++it;
+	}
+	PrintVector(v1);
+}
