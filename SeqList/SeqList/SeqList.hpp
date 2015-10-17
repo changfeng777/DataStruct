@@ -19,7 +19,17 @@ public:
 		_data = new T[_capacity];
 
 		// 此处需要类型萃取后进行处理，对自动义类型进行依次的拷贝
-		memcpy(_data, v._data, sizeof(_size)*_size);
+
+		// 此处可使用类型萃取进行优化
+
+		if(TypeTraits<T>::__IsPODType().Get())
+		//memcpy(tmp, _data, sizeof(T)*_size);
+
+		// T->string
+		for(size_t i = 0; i < _size; ++i)
+		{
+			tmp[i] = _data[i];  //string operator=
+		}
 	}
 
 	//SeqList& operator=(const SeqList& v)
@@ -66,8 +76,13 @@ protected:
 		 T* tmp = new T[_capacity];
 		 if (_data)
 		 {
-			 // 此处需进行萃取以后再处理
-			 memcpy(tmp, _data, sizeof(T)*_size);
+			 // 此处可使用类型萃取进行优化
+			 //memcpy(tmp, _data, sizeof(T)*_size);
+			 for(size_t i = 0; i < _size; ++i)
+			 {
+				 tmp[i] = _data[i]; 
+			 }
+			 
 			 delete [] _data;
 		 }
 

@@ -40,12 +40,12 @@ void PopBack(SeqList* pSeq);
 void PushFront(SeqList* pSeq, DataType x);
 void PopFront(SeqList* pSeq);
 
-// 插入/修改/删除/查找
+// 插入/修改/删除/查找(未实现--均与静态顺序表大致相同)
 void Insert(SeqList* pSeq, size_t index, DataType x);
 void Modified (SeqList* pSeq, size_t index, DataType x);
-void Remove(SeqList* pSeq, size_t index);
+void Erase(SeqList* pSeq, size_t index);
 FindRet Find(SeqList* pSeq, DataType x, size_t index);
-Tag Erase(SeqList* pSeq, DataType x, Tag all);
+Tag Remove(SeqList* pSeq, DataType x, Tag all);
 
 // 冒泡排序/选择排序/二分查找
 void Swap(DataType* left, DataType* right);
@@ -97,7 +97,6 @@ void DestorySeqList(SeqList* pSeq)
 		pSeq->capicity = 0;
 	}
 }
-
 
 void PushBack(SeqList* pSeq, DataType x)
 {

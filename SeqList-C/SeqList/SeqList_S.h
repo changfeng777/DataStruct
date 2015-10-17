@@ -35,7 +35,7 @@ void PopFront(SeqList* pSeq);
 
 void Insert(SeqList* pSeq, size_t index, DataType x);
 void Modified (SeqList* pSeq, size_t index, DataType x );
-void Remove(SeqList* pSeq, size_t index);
+void Erase(SeqList* pSeq, size_t index);
 
 // 返回-1，表示查找失败。
 // 返回>=0，表示查找成功,返回值表示查找到数据的下标。
@@ -43,13 +43,13 @@ FindRet Find(SeqList* pSeq, DataType x, size_t index);
 
 // 返回-1，表示删除失败。
 // 返回0，表示删除成功。
-//int Erase(SeqList* pSeq, DataType x);
+//int Remove(SeqList* pSeq, DataType x);
 
 // 返回-1，表示删除失败。
 // 返回0，表示删除成功。
 // all等于0表示删除所有x
 // all等于-1表示删除第一个数据
-Tag Erase(SeqList* pSeq, DataType x, Tag all);
+Tag Remove(SeqList* pSeq, DataType x, Tag all);
 
 /////////////////////////////////////////////////////////////
 // 实现
@@ -171,7 +171,7 @@ void Modified (SeqList* pSeq, size_t index, DataType x )
 	pSeq->array[index] = x;
 }
 
-void Remove (SeqList* pSeq, size_t index)
+void Erase (SeqList* pSeq, size_t index)
 {
 	assert(pSeq);
 	assert(index < pSeq->size);
@@ -205,7 +205,7 @@ FindRet Find(SeqList* pSeq, DataType x, size_t index)
 
 //// 返回-1，表示删除失败。
 //// 返回0，表示删除成功。
-//int Erase(SeqList* pSeq, DataType x)
+//int Remove(SeqList* pSeq, DataType x)
 //{
 //	int i = 0;
 //	assert(pSeq);
@@ -236,7 +236,7 @@ FindRet Find(SeqList* pSeq, DataType x, size_t index)
 
 // 返回-1，表示删除失败。
 // 返回0，表示删除成功。
-//int Erase(SeqList* pSeq, DataType x)
+//int Remove(SeqList* pSeq, DataType x)
 //{
 //	int ret = 0;
 //	assert(pSeq);
@@ -253,7 +253,7 @@ FindRet Find(SeqList* pSeq, DataType x, size_t index)
 //	}
 //}
 
-Tag Erase(SeqList* pSeq, DataType x, Tag all)
+Tag Remove(SeqList* pSeq, DataType x, Tag all)
 {
 	Tag success = FALSE;
 	FindRet ret;
@@ -263,7 +263,7 @@ Tag Erase(SeqList* pSeq, DataType x, Tag all)
 	while(ret.isFind == TRUE)
 	{
 		success = TRUE;
-		Remove(pSeq, ret.index);
+		Erase(pSeq, ret.index);
 
 		if (all == FALSE)
 		{
