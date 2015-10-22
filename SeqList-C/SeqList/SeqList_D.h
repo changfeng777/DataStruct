@@ -40,7 +40,7 @@ void PopBack(SeqList* pSeq);
 void PushFront(SeqList* pSeq, DataType x);
 void PopFront(SeqList* pSeq);
 
-// 插入/修改/删除/查找(未实现--均与静态顺序表大致相同)
+// 插入/修改/删除/查找(ps:逻辑均与静态顺序表大致相同，所以未实现)
 void Insert(SeqList* pSeq, size_t index, DataType x);
 void Modified (SeqList* pSeq, size_t index, DataType x);
 void Erase(SeqList* pSeq, size_t index);

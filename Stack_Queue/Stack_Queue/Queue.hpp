@@ -128,3 +128,22 @@ private:
 
 	int _size;
 };
+
+void TestQueue()
+{
+	Queue<int> q;
+	q.Push(1);
+	q.Push(2);
+	q.Push(3);
+	q.Push(4);
+	q.Push(5);
+
+	q.Print();
+
+	q.Pop();
+	q.Pop();
+	q.Pop();
+	q.Pop();
+
+	q.Print();
+}

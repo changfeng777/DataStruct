@@ -104,3 +104,31 @@ bool Stack<T>::Empty()
 {
 	return _size == 0;
 }
+
+void TestStack()
+{
+	Stack<int> s1;
+	cout<<"Stack is Empty:"<<s1.Empty()<<endl;
+
+	s1.Push(1);
+	s1.Push(2);
+	s1.Push(3);
+	s1.Push(4);
+	s1.Push(5);
+
+	cout<<s1.Top()<<endl;
+	s1.Pop();
+
+	cout<<s1.Top()<<endl;
+	s1.Pop();
+
+	cout<<s1.Top()<<endl;
+	s1.Pop();
+
+	cout<<s1.Top()<<endl;
+	s1.Pop();
+
+	cout<<s1.Top()<<endl;
+	s1.Pop();
+	s1.Print();
+}
