@@ -16,6 +16,11 @@ typedef struct Node
 //typedef struct Node  Node;
 //typedef struct Node* PLinkList;
 
+//
+// ps:PushBack/PopBack等接口的参数使用PLinkList*的二级指针做参数，
+// 可以先讲解修改链表时为什么要用二级指针，后续为了方便可以改用引用。
+//
+
 /////////////////////////////////////////////////////////////////////////////////
 // 单链表的基本操作
 
@@ -371,38 +376,29 @@ Node* JosephCycle(PLinkList pList, int m)
 }
 
 // 逆置
-void Reverse (PLinkList* ppList)
+void Reverse (PLinkList& pList)
 {
-	Node* head = 0;
-	Node* next = 0;
-	assert(ppList);
+	Node* newHead = NULL;
+	Node* cur = pList;
 
 	// 无节点或只有一个节点则直接返回
-	if (*ppList == NULL || (*ppList)->_next == NULL)
-	{
+	if (pList == NULL || pList->_next == NULL)
 		return;
-	}
-
-	// 取出next节点
-	next = (*ppList)->_next;
-
-	// 取出头结点并置空尾指针
-	head = *ppList;
-	head->_next = 0; 
 
 	// 从第二个节点开始进行头插。
-	while (next)
+	while (cur)
 	{
-		Node* tmp = next;
+		// 摘节点
+		Node* tmp = cur;
+		cur = cur->_next;
 
-		next = next->_next;
-
-		tmp->_next = head;
-		head = tmp;
+		// 头插
+		tmp->_next = newHead;
+		newHead = tmp;
 	}
 
 	// 更新头结点指针
-	*ppList = head;
+	pList = newHead;
 }
 
 // 排序-（冒泡升序排序）
@@ -458,11 +454,14 @@ void BubbleSort(PLinkList pList, Node* end)
 //
 Node* Partion(Node* left, Node* right, int& leftCnt, int& rightCnt)
 {
+	// left和right是[)的区间
 	Node* key = left;
 
-	Node* prev = left, *next = left->_next;
 	leftCnt = 0, rightCnt = 0;
 	int totalCnt = 0;
+
+	// 一前一后指针在调整序列
+	Node* prev = left, *next = left->_next;
 	while (next != right)
 	{
 		if (next->_data <= key->_data)
@@ -489,7 +488,7 @@ Node* Partion(Node* left, Node* right, int& leftCnt, int& rightCnt)
 	return prev;
 }
 
-// 排序优化->快速排序
+// 排序优化->快速排序 left和right是[)的区间
 void QucikSort_OP(PLinkList left, PLinkList right)
 {
 	int leftCnt,rightCnt;
@@ -497,6 +496,7 @@ void QucikSort_OP(PLinkList left, PLinkList right)
 	if ((left != right) 
 		&& (left && left->_next != right))
 	{
+		// 使用当序列小于13时，使用冒泡排序进行优化
 		Node* key = Partion(left, right, leftCnt, rightCnt);
 		if (leftCnt < 13)
 		{
@@ -732,7 +732,11 @@ int CheckCycle(PLinkList pList, PLinkList* meetNode)
 	return -1;
 }
 
+//
 // 获取环入口点
+// 获取环的入口点还有另外一种简单的方法--一个指针从相遇点开始走
+// 另外一个指针从头开始走，两个指针相遇时，则是入口点,请进行证明！^^
+//
 Node* GetCycleEntryNode(PLinkList pList, PLinkList meetNode)
 {
 	int length1 = 0, length2 = 0, interval = 0;
@@ -788,7 +792,8 @@ Node* GetCycleEntryNode(PLinkList pList, PLinkList meetNode)
 
 //
 // 判断两个链表是否相交，假设两个链表都不带环。
-// 求环的交点，长链表先走n步（n为两链表的长度差），然后再一起走，第一个相遇点则为交点。
+// 求环的交点，长链表先走n步（n为两链表的长度差），然后再一起走，第一个相遇点则为交点。(未实现)
+// 这里还需要考虑链表带环时，链表的相交问题。
 //
 int CheckCross(PLinkList pList1, PLinkList pList2)
 {
@@ -838,7 +843,7 @@ ComplexNode* CreateComplexNode(DataType x)
 	return tmp;
 }
 
-void CreateComplexNode(ComplexNode*& head)
+void CreateComplexList(ComplexNode*& head)
 {
 	ComplexNode* n1 = CreateComplexNode(1);
 	ComplexNode* n2 = CreateComplexNode(2);

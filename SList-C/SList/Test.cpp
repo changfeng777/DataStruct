@@ -210,7 +210,7 @@ void Test9()
 	PushFront(&pList, 4);
 	PrintSList(pList);
 
-	Reverse(&pList);
+	Reverse(pList);
 	PrintSList(pList);
 
 	DestorySList(&pList);
@@ -594,7 +594,7 @@ void Test19()
 void Test20()
 {
 	ComplexNode* cpList;
-	CreateComplexNode(cpList);
+	CreateComplexList(cpList);
 	PrintComplexList(cpList);
 
 	ComplexNode* copyList = CopyComplexList(cpList);
@@ -622,7 +622,7 @@ int main()
 	//Test17();
 	//Test18();
 	//Test19();
-	//Test20();
+	Test20();
 
 	return 0;
 }
