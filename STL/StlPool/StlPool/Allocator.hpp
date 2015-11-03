@@ -42,6 +42,11 @@ inline static void __trace_debug(const char* function,
 #define __TRACE_DEBUG(...)	\
 	__trace_debug(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);
 
+
+////////////////////////////////////////////////////////////////////////////
+// 以下是模拟实现SGI STL30版的内存配置器。
+// ps:这个版本对应的是侯捷老师《STL源码剖析》这本书的代码版本，这里模拟实现主要用于教学。
+
 // SimpleAlloc统一封装的内存分配的接口
 template<class T, class Alloc>
 class SimpleAlloc
