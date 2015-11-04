@@ -2,13 +2,26 @@
 #include "TypeTraits.hpp"
 #include "Iterator.hpp"
 
+// 此处的Copy可进行优化，萃取迭代器类型，根据不同类型的迭代器类型进行对应的处理
+template <class InputIterator, class OutputIterator>
+inline OutputIterator Copy(InputIterator first, InputIterator last,
+						   OutputIterator result)
+{
+	// memcpy
+	InputIterator cur = result;
+	for ( ; first != last; ++first, ++cur)
+		*cur = *first;
+
+	return cur;
+}
+
 // 拷贝一段未初始化的数据
 template <class InputIterator, class ForwardIterator>
 inline ForwardIterator 
 __UninitializedCopyAux(InputIterator first, InputIterator last,
 						 ForwardIterator result, __TrueType)
 {
-	return copy(first, last, result);
+	return Copy(first, last, result);
 }
 
 template <class InputIterator, class ForwardIterator>

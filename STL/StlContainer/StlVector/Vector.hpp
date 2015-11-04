@@ -1,25 +1,33 @@
 #pragma once
 #include <assert.h>
 
-template<class T>
+#include "../Common/Allocator.hpp"
+#include "../Common/Uninitialized.hpp"
+
+template<class T, class Allocator = Alloc>
 class Vector
 {
 public:
+	// const版本给对应const成员使用
 	typedef T ValueType;
 	typedef ptrdiff_t  DifferenceType;
 	typedef ValueType* Pointer;
+	typedef const ValueType* ConstPointer;
 	typedef ValueType& Reference;
+	typedef const ValueType& ConstReference;
 
 	//
 	// Vector的迭代器是一个原生指针，所以是是一个随机迭代器类型
 	// 是通过特化 struct IteratorTraits<T*>的方式定义的
 	//
 	typedef ValueType* Iterator;
+	typedef const ValueType* ConstIterator;
 
+	// 重定义空间配置器类型
+	typedef SimpleAlloc<ValueType, Alloc> DataAllocator;
 
 	Iterator Begin() { return _start; }
 	Iterator End() { return _finish; }
-
 
 	size_t Size()
 	{
@@ -37,15 +45,28 @@ public:
 		,_endOfStorage(NULL)
 	{}
 
+	~Vector()
+	{
+		// 释放空间
+		DataAllocator::Deallocate(_start, _finish - _start);
+	}
+
 	void _CheckExpand()
 	{
 		if (_finish == _endOfStorage)
 		{
-			size_t size = Size();
+		/*	size_t size = Size();
 			size_t capacity = size*2 + 3;
 			T* tmp = new T[capacity];
 			if (_start)
 				memcpy(tmp, _start, sizeof(T)*size);
+		*/
+			// 调用空间配置器分配，并实现的拷贝算法进行拷贝。
+			size_t size = Size();
+			size_t capacity = size*2 + 3;
+			T* tmp = (T*)DataAllocator::Allocate(capacity);
+			if (_start)
+				UninitializedCopy(_start, _finish, tmp);
 			
 			_start = tmp;
 			_finish = _start + size;

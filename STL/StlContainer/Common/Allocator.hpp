@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#define __DEBUG__
+//#define __DEBUG__
 
 static string GetFileName(const string& path)
 {
