@@ -18,6 +18,7 @@
 
 // 1.实现一个栈，要求实现Push（出栈）、Pop（入栈）、Min（返回最小值的操作）的时间复杂度为O(1)
 
+// 思路一：单栈实现
 template<class T>
 class Stack_Min1
 {
@@ -59,6 +60,7 @@ private:
 	T min;
 };
 
+// 思路二：双栈实现
 template<class T>
 class Stack_Min2
 {
@@ -107,14 +109,15 @@ class QueueBy2Stack
 public:
 	void Push(const T& x)
 	{
-		if (_s1.Empty())
+		// ps：这里可以直接简化掉
+		/*if (_s1.Empty())
 		{
 			while (!_s2.Empty())
 			{
 				_s1.Push(_s2.Top());
 				_s2.Pop();
 			}
-		}
+		}*/
 
 		_s1.Push(x);
 	}
@@ -134,8 +137,8 @@ public:
 	}
 
 private:
-	Stack<T> _s1;
-	Stack<T> _s2;
+	Stack<T> _s1;	// 进数据的栈
+	Stack<T> _s2;	// 出数据的栈
 };
 
 // 3.使用两个队列实现一个栈
@@ -191,7 +194,7 @@ bool IsVaildStackOrder(const vector<int>& v1, const vector<int>& v2)
 	// 
 	// 使用一个栈来模拟出栈入栈顺序
 	//
-	int index1 = 0, index2 = 0;
+	size_t index1 = 0, index2 = 0;
 	Stack<int> s;
 	while (index2 < v2.size())
 	{
@@ -215,90 +218,9 @@ bool IsVaildStackOrder(const vector<int>& v1, const vector<int>& v2)
 	return true;
 }
 
-// 一个数组实现两个栈 -- 方法1
+// 一个数组实现两个栈
+// 方法1:使用奇偶位分别存储两个栈
 #define MaxSize 100
-class DoubleStack
-{
-public:
-	DoubleStack()
-		:_topIndex1(0)
-		,_topIndex2(1)
-	{}
-
-	void Push1(int x)
-	{
-		if (_topIndex1 < MaxSize)
-		{
-			_array[_topIndex1] = x;
-			_topIndex1 += 2;
-		}
-		else
-		{
-			cout<<"Stack1 Is Full"<<endl;
-		}
-	}
-	void Push2(int x)
-	{
-		if (_topIndex2 < MaxSize)
-		{
-			_array[_topIndex2] = x;
-			_topIndex2 += 2;
-		}
-		else
-		{
-			cout<<"Stack2 Is Full"<<endl;
-		}
-	}
-
-	void Pop1()
-	{
-		if (_topIndex1 > 0)
-		{
-			_topIndex1 -= 2;
-		}
-		else
-		{
-			cout<<"Stack1 Is Empty"<<endl;
-		}
-	}
-	void Pop2()
-	{
-		if (_topIndex2 > 0)
-		{
-			_topIndex2 -= 2;
-		}
-		else
-		{
-			cout<<"Stack2 Is Empty"<<endl;
-		}
-	}
-
-	int Top1()
-	{
-		return _array[_topIndex1 - 2];
-	}
-	int Top2()
-	{
-		return _array[_topIndex2 - 2];
-	}
-
-	bool IsStack1Empty()
-	{
-		return _topIndex1 > 0;
-	}
-
-	bool IsStack2Empty()
-	{
-		return _topIndex2 > 1;
-	}
-
-private:
-	int _array[MaxSize];
-	int _topIndex1;
-	int _topIndex2;
-};
-
-// 方法2
 int Stack2Array[MaxSize] = {0};
 class Stack2
 {
@@ -311,12 +233,16 @@ public:
 
 	void Push(int x)
 	{
+		assert(_topIndex < MaxSize);
+
 		_array[_topIndex] = x;
 		_topIndex += 2;
 	}
 
 	void Pop()
 	{
+		assert(_topIndex > _beginIndex);
+
 		_topIndex -= 2;
 	}
 	int Top()
@@ -325,11 +251,60 @@ public:
 	}
 	bool Empty()
 	{
-		return _topIndex > _beginIndex;
+		return _topIndex == _beginIndex;
 	}
 
 private:
 	int* _array;
+	int _topIndex;
+	const int _beginIndex;
+};
+
+// 方法2:考虑栈的奇偶位双栈的动态增长(扩展)
+// 如此结构设计是为了达到可以创建出多个双栈实例
+class Stack2_D
+{
+public:
+	Stack2_D(int*& array, int& capacity, int topIndex)
+		:_array(array)
+		,_capacity(capacity)
+		,_topIndex(topIndex)
+		,_beginIndex(topIndex)
+	{}
+
+	void Push(int x)
+	{
+		// 扩容
+		if (_capacity >= _topIndex)
+		{
+			_capacity=2*_capacity+3;
+			_array = (int*)realloc(_array, _capacity);
+		}
+
+		_array[_topIndex] = x;
+		_topIndex+=2;
+	}
+
+	void Pop()
+	{
+		assert(_topIndex > _beginIndex);
+		_topIndex-=2;
+	}
+
+	bool Empty()
+	{
+		return _topIndex == _beginIndex;
+	}
+
+	int& Top()
+	{
+		return _array[_topIndex];
+	}
+
+private:
+	int*& _array;
+	int& _capacity;
+
 	int _topIndex;
 	const int _beginIndex;
 };
@@ -489,20 +464,6 @@ void TestTopic4()
 // 5
 void TestTopic5()
 {
-	DoubleStack ds;
-	ds.Push1(0);
-	ds.Push1(2);
-	ds.Push1(4);
-
-	ds.Push2(1);
-	ds.Push2(3);
-	ds.Push2(5);
-	ds.Push2(7);
-
-	ds.Pop2();
-	ds.Pop2();
-	ds.Pop2();
-
 	Stack2 s1(0);
 	Stack2 s2(1);
 	s1.Push(0);
@@ -517,6 +478,35 @@ void TestTopic5()
 
 	s1.Pop();
 	s2.Pop();
+
+	int* array1 = NULL;
+	int capacity1 = 0;
+	Stack2_D s3(array1, capacity1, 0);
+	Stack2_D s4(array1, capacity1, 1);
+	s3.Push(0);
+	s3.Push(2);
+	s3.Push(4);
+
+	s3.Pop();
+
+	s4.Push(1);
+	s4.Push(3);
+	s4.Push(5);
+	s4.Pop();
+
+	int* array2 = NULL;
+	int capacity2 = 0;
+	Stack2_D s5(array2, capacity2, 0);
+	Stack2_D s6(array2, capacity2, 1);
+	s5.Push(0);
+	s5.Push(2);
+	s5.Push(4);
+	s5.Pop();
+
+	s6.Push(1);
+	s6.Push(3);
+	s6.Push(5);
+	s6.Pop();
 }
 
 // 6
