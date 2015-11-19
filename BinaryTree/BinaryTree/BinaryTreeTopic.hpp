@@ -24,7 +24,6 @@ Created Time: 2015-8-6
 
 #pragma once
 
-#pragma once
 #include<iostream>
 #include<vector>
 #include<queue>

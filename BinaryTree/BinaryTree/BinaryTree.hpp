@@ -38,6 +38,15 @@ public:
 		:_root(NULL)
 	{}
 
+	BinaryTree(T array[], size_t size)
+	{
+		// 1.创建二叉树
+		int index = 0;
+		_CreateTree(_root, array, size, index);
+	}
+
+	
+
 	//
 	// 实现深拷贝二叉树
 	//
@@ -46,7 +55,7 @@ public:
 		this->_root = _CopyTree(t._root);
 	}
 
-	BinaryTree<T>& operator=(const BinaryTree<T>& t)
+	/*BinaryTree<T>& operator=(const BinaryTree<T>& t)
 	{
 		if (this != &t)
 		{
@@ -55,18 +64,17 @@ public:
 		}
 
 		return *this;
+	}*/
+
+	BinaryTree<T>& operator=(BinaryTree<T> t)
+	{
+		swap(_root, t._root);
+		return *this;
 	}
 
 	~BinaryTree()
 	{
 		Destory();
-	}
-
-	// 1.创建二叉树
-	void CreateTree(T array[], size_t size)
-	{
-		int index = 0;
-		_CreateTree(_root, array, size, index);
 	}
 
 	// 2.遍历二叉树(前序、中序、后序、层序)
@@ -365,8 +373,7 @@ void TestBinaryTree()
 	cout<<"TestBinaryTree:"<<endl;
 
 	int array[20] = {1, 2, 3, '#', '#', 4, '#', '#', 5, 6};
-	BinaryTree<int> tree;
-	tree.CreateTree(array, 10);
+	BinaryTree<int> tree(array, 10);
 
 	tree.PrevOrder();
 	tree.PrevOrder_NonR();
@@ -390,4 +397,60 @@ void TestBinaryTree()
 	BinaryTree<int> treeCopy2;
 	treeCopy2 = tree;
 	treeCopy2.PrevOrder();
+}
+
+// 二叉树三叉链结构--带
+template<class T>
+struct BinaryTreeNode_P
+{
+	T _data;							// 数据
+	BinaryTreeNode_P<T>* _left;		// 左孩子
+	BinaryTreeNode_P<T>* _right;	// 右孩子
+	BinaryTreeNode_P<T>* _parent;	// 父节点
+
+	BinaryTreeNode_P(const T& x)
+		:_data(x)
+		,_left(NULL)
+		,_right(NULL)
+		,_parent(NULL)
+	{}
+};
+
+template<class T>
+class BinaryTree_P
+{
+public:
+	BinaryTree_P(T array[], size_t size)
+	{
+		int index = 0;
+		_CreateTree(_root, array, size, index);
+	}
+protected:
+	// 构建二叉树
+	void _CreateTree(BinaryTreeNode_P<T>*& root, T array[], size_t size, int& index)
+	{
+		if (index < size && array[index] != '#')
+		{
+			root = new BinaryTreeNode_P<T>(array[index]);
+			_CreateTree(root->_left, array, size, ++index);
+			// 更新父节点
+			if (root->_left)
+				root->_left->_parent = root;
+
+			_CreateTree(root->_right, array, size, ++index);
+
+			// 更新父节点
+			if (root->_right)
+				root->_right->_parent = root;
+		}
+	}
+private:
+	BinaryTreeNode_P<T>* _root;
+};
+
+// 测试二叉树
+void TestBinaryTree_P()
+{
+	int array[20] = {1, 2, 3, '#', '#', 4, '#', '#', 5, 6};
+	BinaryTree_P<int> tree(array, 10);
 }

@@ -16,6 +16,7 @@ using namespace std;
 int main()
 {
 	//TestBinaryTree();
+	//TestBinaryTree_P();
 	//TestBinaryTreeTopic();
 	//TestBinaryTreeThd();
 	//TestHeap();
@@ -28,5 +29,3 @@ int main()
 
 	return 0;
 }
-
-
