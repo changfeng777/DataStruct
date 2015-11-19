@@ -139,7 +139,7 @@ public:
 		memset(rowCounts, 0, sizeof(int)*_colSize);
 		memset(rowStart, 0, sizeof(int)*_colSize);
 
-		// 统计转置前矩阵每一列的数据个数
+		// 统计转置后矩阵每一行的数据个数
 		for (size_t i = 0; i < _matrixs.size(); ++i)
 		{
 			rowCounts[_matrixs[i]._col]++;

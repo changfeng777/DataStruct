@@ -2,7 +2,7 @@
 
 enum TYPE
 {
-	HEAD_TYPE = 0,		// 附加头节点nm
+	HEAD_TYPE = 0,		// 附加头节点
 	VALUE_TYPE = 1,		// 存储值的节点
 	SUB_TYPE = 2,		// 指向子表
 };
@@ -65,12 +65,23 @@ public:
 	}
 
 public:
+	bool _IsValueChar(char ch)
+	{
+		if ((ch >= '0' && ch <= '9')
+			|| (ch >= 'a' && ch <= 'z')
+			|| (ch >= 'A' && ch <= 'Z'))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	void CreateList(GeneralListNode*& head, const char*& str)
 	{
-		if (*str == '\0')
-			return;
-
-		if (*str != '(')
+		if (*str++ != '(')
 		{
 			cout<<"invalid str"<<endl;
 		}
@@ -79,12 +90,11 @@ public:
 		head = new GeneralListNode(HEAD_TYPE);
 		GeneralListNode* begin = head;
 
-		// 此处str++跳过( , )等符号
-		while(*str != '\0' && *str++ != ')')
+		while(*str != '\0')
 		{
 			//
 			// 1. ( 是一个子表的开始，创建一个【子表节点】
-			// 2. 创建一个【值节点】
+			// 2. 创建一个【值节点】（考虑空表的情况）
 			//
 			if (*str == '(')
 			{
@@ -93,10 +103,18 @@ public:
 
 				CreateList(begin->_subLink, str);
 			}
-			else if(*str != ')')
+			else if(*str == ')')
+			{
+				return;
+			}
+			else if(_IsValueChar(*str))
 			{
 				begin->_next = new GeneralListNode(VALUE_TYPE, *str++);
 				begin = begin->_next;
+			}
+			else
+			{
+				++str;
 			}
 		}
 	}
@@ -197,7 +215,7 @@ protected:
 			{	
 				size += _Size(begin->_subLink);
 			}
-			else if (begin->_type == VALUE_TYPE)
+			else if(begin->_type == VALUE_TYPE)
 			{
 				++size;
 			}
@@ -267,6 +285,7 @@ private:
 //<2> B = (a,b)
 //<3> C = (a,b,(c,d))
 //<4> D = (a,b,(c,d),(e,(f),h)) 
+//<5> E = (((),()))
 
 void Test1()
 {
@@ -282,8 +301,8 @@ void Test1()
 
 	cout<<"Depth:"<<g2.Depth()<<endl;
 
-	// 三层
-	GeneralList g3("(a,b,(c,d),(e,(f),h))");
+	// 三层 + 有空格的
+	GeneralList g3("(a, b,(c,d),(e,(f),h))");
 	g3.Print();
 
 	cout<<"Depth:"<<g3.Depth()<<endl;
