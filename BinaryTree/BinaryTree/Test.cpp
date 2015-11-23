@@ -18,14 +18,14 @@ int main()
 	//TestBinaryTree();
 	//TestBinaryTree_P();
 	//TestBinaryTreeTopic();
-	//TestBinaryTreeThd();
+	TestBinaryTreeThd();
 	//TestHeap();
 	//TestRedPacket();
 
 	//TestHuffmanTree_A();
 	//TestCompress();
 
-	TestBSTree();
+	//TestBSTree();
 
 	return 0;
 }

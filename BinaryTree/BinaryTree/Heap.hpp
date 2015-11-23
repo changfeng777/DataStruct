@@ -79,8 +79,9 @@ public:
 				++child;
 			}
 
-			// 3.若child小于跟节点，则交换child和root节点，并继续向下调整
+			// 3.若child小于根节点，则交换child和root节点，并继续向下调整
 			if (Compare()(vec[child], vec[root]))
+			//if (vec[child] < vec[root])
 			{
 				swap(vec[child], vec[root]);
 				root = child;

@@ -60,10 +60,23 @@ public:
 		_InThreading(_root, prev);
 	}
 
+	void PrevThreading()
+	{
+		BinaryTreeNode_Thd<T>* prev = NULL;
+		_PrevThreading(_root, prev);
+	}
+
 	void InOrderThreading()
 	{
 		cout<<"InOrderThreading:";
 		_InOrderThreading(_root);
+		cout<<endl;
+	}
+
+	void PrevOrderThreading()
+	{
+		cout<<"PrevOrderThreading:";
+		_PrevOrderThreading(_root);
 		cout<<endl;
 	}
 
@@ -117,11 +130,40 @@ protected:
 		}
 	}
 
+	void _PrevThreading(BinaryTreeNode_Thd<T>* cur, BinaryTreeNode_Thd<T>*& prev)
+	{
+		if(cur)
+		{
+			// 1.线索化当前节点的前驱
+			if (cur->_left == NULL)
+			{
+				cur->_leftTag = THREAD;
+				cur->_left = prev;
+			}
+
+			// 2.线索化前一个节点的后继为当前节点
+			if (prev && prev->_right == NULL)
+			{
+				prev->_rightTag = THREAD;
+				prev->_right = cur;
+			}
+
+			prev = cur;
+
+			// 只有LINK的节点才需要递归，否则前序遍历的节点已线索化。
+			if (cur->_leftTag == LINK)
+				_PrevThreading(cur->_left, prev);
+
+			if (cur->_rightTag == LINK)
+				_PrevThreading(cur->_right, prev);
+		}
+	}
+
 	void _InOrderThreading(BinaryTreeNode_Thd<T>* cur)
 	{
 		while(cur)
 		{
-			// 走左子树，找到第一个要访问的前取节点
+			// 走左子树，找到第一个要访问的前驱节点
 			while (cur && cur->_leftTag == LINK)
 			{
 				cur = cur->_left;
@@ -129,6 +171,32 @@ protected:
 
 			// 访问当前节点
 			cout<<cur->_data<<" ";
+
+			// 访问连接在一起的后继节点
+			while (cur->_rightTag == THREAD && cur->_right)
+			{
+				cur = cur->_right;
+				cout<<cur->_data<<" ";
+			}
+
+			cur = cur->_right;
+		}
+	}
+
+	void _PrevOrderThreading(BinaryTreeNode_Thd<T>* cur)
+	{
+		while(cur)
+		{
+			// 前序遍历路径上的所经节点
+			while (cur)
+			{
+				// 访问当前节点
+				cout<<cur->_data<<" ";
+				if (cur->_leftTag == THREAD)
+					break;
+
+				cur = cur->_left;
+			}
 
 			// 访问连接在一起的后继节点
 			while (cur->_rightTag == THREAD && cur->_right)
@@ -154,6 +222,9 @@ void TestBinaryTreeThd()
 	tree.CreateTree(array, 10);
 	tree.InOrder();
 
-	tree.InThreading();
-	tree.InOrderThreading();
+	//tree.InThreading();
+	//tree.InOrderThreading();
+
+	tree.PrevThreading();
+	tree.PrevOrderThreading();
 }

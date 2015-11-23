@@ -1,5 +1,5 @@
 ////////////////////////////////////////
-// 带头结点结构定义+部分实现
+// 定义带头结点的结构+用于对比不带头结点的结构
 
 #pragma once
 #include <stdio.h>
@@ -8,66 +8,125 @@
 
 typedef int DataType;
 
-typedef struct Node
+typedef struct ListNode
 {
-	DataType data;
-	struct Node* next;
-}Node;
+	DataType _data;
+	struct ListNode* _next;
+}ListNode;
 
-typedef struct List
+ListNode* _BuyNode(DataType x)
 {
-	Node* head;  // 指向单链表的头
-	size_t size;
-}List;
-
-Node* _CreateNode(DataType x)
-{
-	Node* tmp = (Node*)malloc(sizeof(Node));
-	tmp->data = x;
-	tmp->next = NULL;
+	ListNode* tmp = (ListNode*)malloc(sizeof(ListNode));
+	tmp->_data = x;
+	tmp->_next = NULL;
 
 	return tmp;
 }
 
-void InitList(List* pList)
+void PushBack(ListNode* pHead, DataType x)
 {
-	assert(pList);
-	pList->head = NULL;
-	pList->size = 0;
-}
+	assert(pHead);
 
-void PushBack(List* pList, DataType x)
-{
-	assert(pList);
-
-	if (pList->head == NULL)
+	ListNode* tail = pHead;
+	while (tail->_next)
 	{
-		pList->head = _CreateNode(x);
-	}
-	else
-	{
-		Node* end = pList->head;
-		while(end->next != NULL)
-		{
-			end = end->next;
-		}
-
-		end->next = _CreateNode(x);
+		tail = tail->_next;
 	}
 
-	++pList->size;
+	tail->_next = _BuyNode(x);
 }
 
-void PrintList(List* pList)
+void PopBack(ListNode* pHead)
 {
-	Node* begin = pList->head;
-	assert(pList);
+	assert(pHead);
+
+	// 1.没有节点
+	if(pHead->_next == NULL)
+		return;
+
+	// 2.一个及以上节点
+	ListNode* tail = pHead;
+	while (tail->_next->_next)
+	{
+		tail = tail->_next;
+	}
+
+	free(tail->_next);
+	tail->_next = NULL;
+}
+
+void PushFront(ListNode* pHead, DataType x)
+{
+	assert(pHead);
+
+	ListNode* tmp = _BuyNode(x);
+	tmp->_next = pHead->_next;
+	pHead->_next = tmp;
+}
+
+
+void PopFront(ListNode* pHead)
+{
+	assert(pHead);
+
+	if (pHead->_next == NULL)
+		return;
+
+	ListNode* del = pHead->_next;
+	pHead->_next = pHead->_next->_next;
+	free(del);
+}
+
+void PrintList(ListNode* pHead)
+{
+	ListNode* begin = pHead->_next;
+	assert(pHead);
 
 	while (begin)
 	{
-		printf("%d->", begin->data);
-		begin = begin->next;
+		printf("%d->", begin->_data);
+		begin = begin->_next;
 	}
 
 	printf("NULL\n");
+}
+
+void TestSListHead1()
+{
+	ListNode list;
+	list._next = NULL;
+	PushBack(&list, 1);
+	PushBack(&list, 2);
+	PushBack(&list, 3);
+	PushBack(&list, 4);
+
+	PrintList(&list);
+
+	PopBack(&list);
+	PopBack(&list);
+	PopBack(&list);
+	PopBack(&list);
+	PopBack(&list);
+
+	PrintList(&list);
+}
+
+void TestSListHead2()
+{
+	ListNode list;
+	list._next = NULL;
+	PushFront(&list, 1);
+	PushFront(&list, 2);
+	PushFront(&list, 3);
+	PushFront(&list, 4);
+
+	PrintList(&list);
+
+	PopFront(&list);
+	PopFront(&list);
+	PopFront(&list);
+	PopFront(&list);
+	PopFront(&list);
+
+	PrintList(&list);
 }
