@@ -37,7 +37,7 @@ void CreateRedPacket(vector<int>& moneys)
 }
 
 // 堆调整（最小堆）
-void HeapAdjust (int* array, int root, int size )
+void HeapAdjust (int* array, int root, int size)
 {
 	assert(array);
 

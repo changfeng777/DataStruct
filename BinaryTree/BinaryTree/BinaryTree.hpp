@@ -45,8 +45,6 @@ public:
 		_CreateTree(_root, array, size, index);
 	}
 
-	
-
 	//
 	// 实现深拷贝二叉树
 	//

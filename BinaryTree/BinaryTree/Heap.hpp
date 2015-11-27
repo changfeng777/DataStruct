@@ -36,7 +36,7 @@ public:
 	}
 
 	// 插入一个数据x到最小堆中
-	void Insert(const T& x)
+	void Push(const T& x)
 	{
 		_vec.push_back(x);
 
@@ -47,7 +47,7 @@ public:
 	}
 
 	// 删除堆顶元素
-	void Remove()
+	void Pop()
 	{
 		int size = _vec.size();
 		assert(size > 0);
@@ -61,7 +61,7 @@ public:
 		}
 	}
 
-	const T& GetHeapTop()
+	const T& GetTop()
 	{
 		return _vec[0];
 	}
@@ -136,18 +136,18 @@ private:
 void TestHeap()
 {
 	Heap<int, greater<int>> heap;
-	heap.Insert(3);
-	heap.Insert(5);
-	heap.Insert(1);
-	heap.Insert(4);
-	heap.Insert(5);
-	heap.Insert(1);
-	heap.Insert(8);
+	heap.Push(3);
+	heap.Push(5);
+	heap.Push(1);
+	heap.Push(4);
+	heap.Push(5);
+	heap.Push(1);
+	heap.Push(8);
 
 	while (!heap.Empty())
 	{
-		cout<<heap.GetHeapTop()<<" ";
-		heap.Remove();
+		cout<<heap.GetTop()<<" ";
+		heap.Pop();
 	}
 	cout<<endl;
 
@@ -157,8 +157,8 @@ void TestHeap()
 
 	while (!heap1.Empty())
 	{
-		cout<<heap1.GetHeapTop()<<" ";
-		heap1.Remove();
+		cout<<heap1.GetTop()<<" ";
+		heap1.Pop();
 	}
 	cout<<endl;
 }

@@ -69,7 +69,7 @@ public:
 			if (array[i] != invalid)
 			{
 				HuffmanNode_P<T>* node = new HuffmanNode_P<T>(array[i]);
-				minHeap.Insert(node);
+				minHeap.Push(node);
 			}
 		}
 
@@ -77,13 +77,13 @@ public:
 			return;
 
 		// 2.获取出最小和次小的节点做孩子节点，并构建这两个孩子节点的父节点进行链接。
-		HuffmanNode_P<T>* parent = minHeap.GetHeapTop();
+		HuffmanNode_P<T>* parent = minHeap.GetTop();
 		while (minHeap.Size() > 1)
 		{
-			HuffmanNode_P<T>* first = minHeap.GetHeapTop();
-			minHeap.Remove();
-			HuffmanNode_P<T>* second = minHeap.GetHeapTop();
-			minHeap.Remove();
+			HuffmanNode_P<T>* first = minHeap.GetTop();
+			minHeap.Pop();
+			HuffmanNode_P<T>* second = minHeap.GetTop();
+			minHeap.Pop();
 
 			parent = new HuffmanNode_P<T>(first->_weight + second->_weight);
 			parent->_left = first;
@@ -91,7 +91,7 @@ public:
 			first->_parent = parent;
 			second->_parent = parent;
 
-			minHeap.Insert(parent);
+			minHeap.Push(parent);
 		}
 
 		_root = parent;
@@ -184,20 +184,20 @@ public:
 			_vNodes.push_back(HuffmanNode_A<T>(array[index]));
 			HuffmanNode_A<T>& node = _vNodes.back();
 			node._index = index;
-			minHeap.Insert(&node);
+			minHeap.Push(&node);
 		}
 
 		while (minHeap.Size() > 1)
 		{
-			HuffmanNode_A<T>* first = minHeap.GetHeapTop();
-			minHeap.Remove();
-			HuffmanNode_A<T>* second = minHeap.GetHeapTop();
-			minHeap.Remove();
+			HuffmanNode_A<T>* first = minHeap.GetTop();
+			minHeap.Pop();
+			HuffmanNode_A<T>* second = minHeap.GetTop();
+			minHeap.Pop();
 
 			_vNodes.push_back(HuffmanNode_A<T>(first->_weight + second->_weight));
 			HuffmanNode_A<T>& parent = _vNodes.back();
 			parent._index = index++;
-			minHeap.Insert(&parent);
+			minHeap.Push(&parent);
 
 			first->_parent = parent._index;
 			second->_parent = parent._index;
@@ -205,7 +205,7 @@ public:
 			parent._right = second->_index;
 		}
 
-		_rootIndex = minHeap.GetHeapTop()->_index;
+		_rootIndex = minHeap.GetTop()->_index;
 	}
 
 private:

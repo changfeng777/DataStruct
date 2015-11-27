@@ -27,5 +27,7 @@ int main()
 
 	//TestBSTree();
 
+	cout<<(0-1)/2<<endl;
+
 	return 0;
 }
