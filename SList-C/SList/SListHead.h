@@ -14,6 +14,11 @@ typedef struct ListNode
 	struct ListNode* _next;
 }ListNode;
 
+//
+// ps：注意这里切忌使用头结点的_data域存储链表节点个数，否则当DataType是char类型
+// 或者是double类型时会存在设计缺陷和bug。
+//
+
 ListNode* _BuyNode(DataType x)
 {
 	ListNode* tmp = (ListNode*)malloc(sizeof(ListNode));

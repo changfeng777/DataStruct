@@ -7,57 +7,57 @@
 
 typedef int DataType;
 
-typedef struct Node
+typedef struct ListNode
 {
-	DataType	 _data;		// 数据
-	struct Node* _next;		// 指向下一个节点的指针
-}Node, *PLinkList;
+	DataType	 _data;			// 数据
+	struct ListNode* _next;		// 指向下一个节点的指针
+}ListNode, *PListNode;
 
-//typedef struct Node  Node;
-//typedef struct Node* PLinkList;
+//typedef struct ListNode  ListNode;
+//typedef struct ListNode* PListNode;
 
 //
-// ps:PushBack/PopBack等接口的参数使用PLinkList*的二级指针做参数，
+// ps:PushBack/PopBack等接口的参数使用PListNode*的二级指针做参数，
 // 可以先讲解修改链表时为什么要用二级指针，后续为了方便可以改用引用替代。
-// 如：void PushBack (PLinkList& ppList, DataType x);
+// 如：void PushBack (PListNode& ppList, DataType x);
 //
 
 /////////////////////////////////////////////////////////////////////////////////
 // 单链表的基本操作
 
 // 初始化/销毁/打印单链表
-void InitSList(PLinkList* ppList);
-void DestorySList(PLinkList* ppList);
-void PrintSList(PLinkList pList);
-int GetListLength(PLinkList pList);
+void InitSList(PListNode* ppList);
+void DestorySList(PListNode* ppList);
+void PrintSList(PListNode pList);
+int GetLength(PListNode pList);
 
 // 尾插/尾删/头插/头删
-void PushBack (PLinkList* ppList, DataType x);
-void PopBack (PLinkList* ppList);
-void PushFront (PLinkList* ppList, DataType x);
-void PopFront (PLinkList* ppList);
+void PushBack (PListNode* ppList, DataType x);
+void PopBack (PListNode* ppList);
+void PushFront (PListNode* ppList, DataType x);
+void PopFront (PListNode* ppList);
 
 // 查找/删除/插入
-Node* Find (PLinkList pList, DataType x);
-int Remove (PLinkList* ppList, DataType x);
-void Erase (PLinkList* ppList, Node* n);
-void Insert (PLinkList* ppList, Node* n, DataType x);
+ListNode* Find (PListNode pList, DataType x);
+int Remove (PListNode* ppList, DataType x);
+void Erase (PListNode* ppList, ListNode* n);
+void Insert (PListNode* ppList, ListNode* n, DataType x);
 
-void InitSList(PLinkList* ppList)
+void InitSList(PListNode* ppList)
 {
 	assert(ppList);
 
 	*ppList = 0;
 }
 
-void DestorySList(PLinkList* ppList)
+void DestorySList(PListNode* ppList)
 {
-	Node* begin = *ppList;
+	ListNode* begin = *ppList;
 	assert(ppList);
 
 	while (begin)
 	{
-		Node* tmp = begin;
+		ListNode* tmp = begin;
 		begin = begin->_next;
 
 		free (tmp);
@@ -66,11 +66,11 @@ void DestorySList(PLinkList* ppList)
 	*ppList = 0;
 }
 
-void PrintSList(PLinkList pList)
+void PrintSList(PListNode pList)
 {
-	Node* begin = pList;
+	ListNode* begin = pList;
 
-	printf("PLinkList:");
+	printf("PListNode:");
 	while (begin)
 	{
 		printf("->%d", begin->_data);
@@ -79,10 +79,10 @@ void PrintSList(PLinkList pList)
 	printf("->NULL\n");
 }
 
-int GetListLength(PLinkList ppList)
+int GetLength(PListNode ppList)
 {
 	int length = 0;
-	Node* begin = ppList;
+	ListNode* begin = ppList;
 	while (begin)
 	{
 		length++;
@@ -92,18 +92,18 @@ int GetListLength(PLinkList ppList)
 	return length;
 }
 
-Node* CreateNode (DataType x)
+ListNode* CreateNode (DataType x)
 {
-	Node* n = (Node*)malloc (sizeof(Node));
+	ListNode* n = (ListNode*)malloc (sizeof(ListNode));
 	n->_data = x;
 	n->_next = 0;
 
 	return n;
 }
 
-void PushBack (PLinkList* ppList, DataType x)
+void PushBack (PListNode* ppList, DataType x)
 {
-	Node* n = 0;
+	ListNode* n = 0;
 	assert(ppList);
 
 	n = CreateNode (x);
@@ -115,7 +115,7 @@ void PushBack (PLinkList* ppList, DataType x)
 	}
 	else
 	{
-		Node* begin = *ppList; 
+		ListNode* begin = *ppList; 
 		while (begin->_next)
 		{
 			begin = begin->_next;
@@ -125,9 +125,9 @@ void PushBack (PLinkList* ppList, DataType x)
 	}
 }
 
-void PopBack (PLinkList* ppList)
+void PopBack (PListNode* ppList)
 {
-	Node* begin = 0;
+	ListNode* begin = 0;
 	assert(ppList);
 
 	// 1.没有节点
@@ -155,9 +155,9 @@ void PopBack (PLinkList* ppList)
 	begin->_next = 0;
 }
 
-void PushFront (PLinkList* ppList, DataType x)
+void PushFront (PListNode* ppList, DataType x)
 {
-	Node* n = 0;
+	ListNode* n = 0;
 	assert(ppList);
 
 	n = CreateNode(x);
@@ -174,9 +174,9 @@ void PushFront (PLinkList* ppList, DataType x)
 	}
 }
 
-void PopFront (PLinkList* ppList)
+void PopFront (PListNode* ppList)
 {
-	Node* n = 0;
+	ListNode* n = 0;
 	assert(ppList);
 
 	// 没有节点
@@ -199,9 +199,9 @@ void PopFront (PLinkList* ppList)
 	free(n);
 }
 
-Node* Find (PLinkList ppList, DataType x)
+ListNode* Find (PListNode ppList, DataType x)
 {
-	Node* begin = 0;
+	ListNode* begin = 0;
 	assert(ppList);
 
 	begin = ppList;
@@ -218,11 +218,11 @@ Node* Find (PLinkList ppList, DataType x)
 	return 0;
 }
 
-int Remove (PLinkList* ppList, DataType x)
+int Remove (PListNode* ppList, DataType x)
 {
-	Node* prev = 0;
-	Node* begin = 0;
-	Node* del = 0;
+	ListNode* prev = 0;
+	ListNode* begin = 0;
+	ListNode* del = 0;
 	assert(ppList);
 
 	begin = *ppList;
@@ -230,7 +230,7 @@ int Remove (PLinkList* ppList, DataType x)
 	{
 		if (begin->_data == x)
 		{
-			Node* del = begin;
+			ListNode* del = begin;
 
 			// 头节点 or 中间节点
 			if (*ppList == begin)
@@ -254,9 +254,9 @@ int Remove (PLinkList* ppList, DataType x)
 	return -1;
 }
 
-void Insert (PLinkList* ppList, Node* n, DataType x)
+void Insert (PListNode* ppList, ListNode* n, DataType x)
 {
-	Node* tmp = 0;
+	ListNode* tmp = 0;
 	assert(ppList);
 
 	tmp = CreateNode(x);
@@ -274,9 +274,9 @@ void Insert (PLinkList* ppList, Node* n, DataType x)
 	}
 }
 
-void Erase (PLinkList* ppList, Node* n)
+void Erase (PListNode* ppList, ListNode* n)
 {
-	Node* del = 0;
+	ListNode* del = 0;
 	assert(ppList);
 	assert(n);
 
@@ -312,14 +312,14 @@ void Erase (PLinkList* ppList, Node* n)
 //12. 判断两个链表是否相交，若相交，求交点。（假设链表不带环）
 //13. 判断两个链表是否相交，若相交，求交点。（假设链表可能带环）【升级版】
 //14. 复杂链表的复制。一个链表的每个节点，有一个指向next指针指向下一个节点，还有一个random指针指向这个链表中的一个随机节点或者NULL，现在要求实现复制这个链表，返回复制后的新链表。
-//15.求两个已排序链表中相同的数据。void UnionSet(Node* l1, Node* l2);
+//15.求两个已排序链表中相同的数据。void UnionSet(ListNode* l1, ListNode* l2);
 //
 
 
 // 删除单链表的一个非尾节点
-void DelNonTailNode (Node* n)
+void DelNonTailNode (ListNode* n)
 {
-	Node* del = 0;
+	ListNode* del = 0;
 
 	// 断言是否是尾节点
 	assert(n->_next);
@@ -332,10 +332,10 @@ void DelNonTailNode (Node* n)
 }
 
 // 在当前节点前插入一个数据x
-void InsertFrontNode (Node* n, DataType x)
+void InsertFrontNode (ListNode* n, DataType x)
 {
 	DataType tmpData;
-	Node* tmpNode = CreateNode(x);
+	ListNode* tmpNode = CreateNode(x);
 	assert(n);
 
 	// 数据插到当前节点后
@@ -352,14 +352,14 @@ void InsertFrontNode (Node* n, DataType x)
 //约瑟夫环（约瑟夫问题）是一个数学的应用问题：已知n个人（以编号1，2，3...n分别表示）围坐在一张//圆桌周围。从编号为k的人开始报数，数到m的那个人出列；他的下一个人又从1开始报数，数到m的那个人//又出列；依此规律重复下去，直到圆桌周围的人全部出列。
 //
 
-Node* JosephCycle(PLinkList pList, int m)
+ListNode* JosephCycle(PListNode pList, int m)
 {
-	Node* begin = pList;
+	ListNode* begin = pList;
 	assert(pList);
 
 	while (1)
 	{
-		Node* del = 0;
+		ListNode* del = 0;
 		int i = 0;
 
 		// 判断只有一个节点时退出
@@ -387,16 +387,16 @@ Node* JosephCycle(PLinkList pList, int m)
 }
 
 // 逆置
-void Reverse (PLinkList& pList)
+void Reverse (PListNode& pList)
 {
-	Node* newHead = NULL;
-	Node* cur = pList;
+	ListNode* newHead = NULL;
+	ListNode* cur = pList;
 
 	// 从第二个节点开始进行头插。
 	while (cur)
 	{
 		// 摘节点
-		Node* tmp = cur;
+		ListNode* tmp = cur;
 		cur = cur->_next;
 
 		// 头插
@@ -409,25 +409,18 @@ void Reverse (PLinkList& pList)
 }
 
 // 排序-（冒泡升序排序）
-void BubbleSort(PLinkList pList, Node* end)
+void BubbleSort(PListNode pList)
 {
-	// 优化标记
-	int exchange = 0;
+	ListNode* prev = NULL;
+	ListNode* next = NULL;
+	ListNode* tail = NULL;
 
-	Node* prev = NULL;
-	Node* next = NULL;
-	Node* tail = NULL;
-
-	// 没有节点 or 一个节点则直接返回
-	if (pList == end || pList->_next == end)
-	{
-		return;
-	}
-
-	// tail做尾标记
-	tail = end;
+	// tail做冒泡排序的尾标记
 	while (tail != pList)
 	{
+		// 优化标记
+		int exchange = 0;
+
 		// 将数据向后冒
 		prev = pList;
 		next = pList->_next;
@@ -457,18 +450,19 @@ void BubbleSort(PLinkList pList, Node* end)
 //
 // 使用前后指针版的快速排序
 //
-Node* Partion(Node* left, Node* right, int& leftCnt, int& rightCnt)
+void PartionSort(ListNode* left, ListNode* right)
 {
-	// left和right是[)的区间
-	Node* key = left;
+	if (left == right || left->_next == right)
+		return;
 
-	leftCnt = 0, rightCnt = 0;
-	int totalCnt = 0;
+	// left和right是[)的区间
+	ListNode* key = left;
 
 	// 一前一后指针在调整序列
-	Node* prev = left, *next = left->_next;
+	ListNode* prev = left, *next = left->_next;
 	while (next != right)
 	{
+		// 如果找到比key小的值则进行交换
 		if (next->_data <= key->_data)
 		{
 			prev = prev->_next;
@@ -476,67 +470,29 @@ Node* Partion(Node* left, Node* right, int& leftCnt, int& rightCnt)
 			{
 				swap(prev->_data, next->_data);
 			}
-			leftCnt++;
 		}
 
 		next = next->_next;
-		totalCnt++;
 	}
-
-	rightCnt = totalCnt - leftCnt; 
 
 	if (prev != key)
 	{
 		swap(prev->_data, key->_data);
 	}
 
-	return prev;
+	PartionSort(left, prev);
+	PartionSort(prev->_next, right);
 }
 
 // 排序优化->快速排序 left和right是[)的区间
-void QucikSort_OP(PLinkList left, PLinkList right)
+void QucikSort(PListNode pList)
 {
-	int leftCnt,rightCnt;
-	// 一个节点或者一个
-	if ((left != right) 
-		&& (left && left->_next != right))
-	{
-		// 使用当序列小于13时，使用冒泡排序进行优化
-		Node* key = Partion(left, right, leftCnt, rightCnt);
-		if (leftCnt < 13)
-		{
-			BubbleSort(left, key);
-		}
-		else
-		{
-			QucikSort_OP(left, key);
-		}
-		if (rightCnt < 13)
-		{
-			BubbleSort(key->_next, right);
-		}
-		else
-		{
-			QucikSort_OP(key->_next, right);
-		}
-	}
+	PartionSort(pList, NULL);
 }
 
 // 合并两个有序链表，合并后的链表依然有序
-PLinkList Merge(PLinkList pList1, PLinkList pList2)
+PListNode Merge(PListNode pList1, PListNode pList2)
 {
-	PLinkList mergePList;
-	Node* tail = 0;
-
-	Node* begin1 = 0;
-	Node* begin2 = 0;
-
-	// 若两个链表相同，则直接返回
-	if (pList1 == pList2)
-	{
-		return pList1;
-	}
-
 	// 若其中一个链表为空，则返回另一个链表
 	if (pList1 == NULL)
 	{
@@ -547,58 +503,58 @@ PLinkList Merge(PLinkList pList1, PLinkList pList2)
 		return pList2;
 	}
 
+	PListNode newList, tail;
 	// 取出数据小的节点为新链表的头结点。
-	begin1 = pList1;
-	begin2 = pList2;
-	if(begin1->_data < begin2->_data)
+	if (pList1->_data < pList2->_data)
 	{
-		mergePList = begin1;
-		begin1 = begin1->_next;
+		newList = pList1;
+		pList1 = pList1->_next;
 	}
 	else
 	{
-		mergePList = begin2;
-		begin2 = begin2->_next;
+		newList = pList2;
+		pList2 = pList2->_next;
 	}
 
 	// 标记尾节点，方便归并的数据尾插。
-	tail = mergePList;
+	tail = newList;
 
-	while (begin1 && begin2)
+	while (pList1 && pList2)
 	{
-		if (begin1->_data < begin2->_data)
+		if (pList1->_data < pList2->_data)
 		{
-			tail->_next = begin1;
-			begin1 = begin1->_next;
+			tail->_next = pList1;
+			pList1 = pList1->_next;
 
 			tail = tail->_next;
 		}
 		else
 		{
-			tail->_next = begin2;
-			begin2 = begin2->_next;
+			tail->_next = pList2;
+			pList2 = pList2->_next;
 
 			tail = tail->_next;
 		}
 	}
 
 	// 链接剩余尾链表
-	if (begin1)
+	if (pList1)
 	{
-		tail->_next = begin1;
-	}
-	else if (begin2)
-	{
-		tail->_next = begin2;
+		tail->_next = pList1;
 	}
 
-	return mergePList;
+	if (pList2)
+	{
+		tail->_next = pList2;
+	}
+
+	return newList;
 }
 
 // 递归实现链表合并
-PLinkList MergeRecursive(PLinkList pList1, PLinkList pList2)
+PListNode MergeRecursive(PListNode pList1, PListNode pList2)
 {
-	PLinkList mergePList;
+	PListNode mergePList;
 
 	// 若两个链表相同，则直接返回
 	if (pList1 == pList2)
@@ -633,16 +589,10 @@ PLinkList MergeRecursive(PLinkList pList1, PLinkList pList2)
 // 【快慢指针问题】
 
 // 查找单链表的中间节点
-PLinkList FindMidNode(PLinkList pList)
+PListNode FindMidNode(PListNode pList)
 {
 	// 快慢指针，快指针一次走两步，慢指针一次走一步。
-	PLinkList slow, fast;
-
-	if (pList == NULL)
-	{
-		return pList;
-	}
-
+	PListNode slow, fast;
 	slow = pList;
 	fast = pList;
 
@@ -662,15 +612,9 @@ PLinkList FindMidNode(PLinkList pList)
 
 // 删除单链表的倒数第k个节点(k > 1 && k < 链表的总长度);
 // 时间复杂度O(N)
-void DelKNode(PLinkList pList, int k)
+void DelKNode(PListNode pList, int k)
 {
-	PLinkList slow, fast;
-
-	if (pList == NULL)
-	{
-		return;
-	}
-
+	PListNode slow, fast;
 	slow = pList;
 	fast = pList;
 
@@ -689,7 +633,7 @@ void DelKNode(PLinkList pList, int k)
 
 	if (k < 0)
 	{
-		Node* del = slow->_next;
+		ListNode* del = slow->_next;
 		slow->_data = slow->_next->_data;
 		slow->_next = slow->_next->_next;
 		free(del);
@@ -699,9 +643,9 @@ void DelKNode(PLinkList pList, int k)
 // 【链表带环问题】
 
 // 判断链表是否带环, 若链表带环则求环的长度和相遇节点，不带环返回-1
-int CheckCycle(PLinkList pList, PLinkList* meetNode)
+int CheckCycle(PListNode pList, PListNode* meetNode)
 {
-	PLinkList slow, fast;
+	PListNode slow, fast;
 
 	if (pList == NULL)
 	{
@@ -742,10 +686,10 @@ int CheckCycle(PLinkList pList, PLinkList* meetNode)
 // 获取环的入口点还有另外一种简单的方法--一个指针从相遇点开始走
 // 另外一个指针从头开始走，两个指针相遇时，则是入口点,请进行证明！^^
 //
-Node* GetCycleEntryNode(PLinkList pList, PLinkList meetNode)
+ListNode* GetCycleEntryNode(PListNode pList, PListNode meetNode)
 {
 	int length1 = 0, length2 = 0, interval = 0;
-	Node* begin1 = pList, *begin2 = meetNode->_next;
+	ListNode* begin1 = pList, *begin2 = meetNode->_next;
 
 	assert(pList);
 	assert(meetNode);
@@ -800,9 +744,9 @@ Node* GetCycleEntryNode(PLinkList pList, PLinkList meetNode)
 // 求环的交点，长链表先走n步（n为两链表的长度差），然后再一起走，第一个相遇点则为交点。(未实现)
 // 这里还需要考虑链表带环时，链表的相交问题。
 //
-int CheckCross(PLinkList pList1, PLinkList pList2)
+int CheckCross(PListNode pList1, PListNode pList2)
 {
-	Node* end1 = 0, *end2 = 0;
+	ListNode* end1 = 0, *end2 = 0;
 	assert(pList1 && pList2);
 
 	while (pList1)
@@ -942,7 +886,7 @@ ComplexNode* CopyComplexList(ComplexNode* cpList)
 // 测试PushBack
 void Test1()
 {
-	PLinkList pList;
+	PListNode pList;
 	printf("Test PushBack begin\n");
 
 	InitSList(&pList);
@@ -962,7 +906,7 @@ void Test1()
 // 测试PopBack
 void Test2()
 {
-	PLinkList pList;
+	PListNode pList;
 	printf("Test PopBack begin\n");
 
 	InitSList(&pList);
@@ -989,7 +933,7 @@ void Test2()
 // PushFront
 void Test3()
 {
-	PLinkList pList;
+	PListNode pList;
 	printf("Test PushFront begin\n");
 
 	InitSList(&pList);
@@ -1009,7 +953,7 @@ void Test3()
 // PopFront
 void Test4()
 {
-	PLinkList pList;
+	PListNode pList;
 	printf("Test PopFront begin\n");
 
 	InitSList(&pList);
@@ -1034,7 +978,7 @@ void Test4()
 // Find
 void Test5()
 {
-	PLinkList pList;
+	PListNode pList;
 	printf("Test Find begin\n");
 
 	InitSList(&pList);
@@ -1063,7 +1007,7 @@ void Test5()
 // Remove
 void Test6()
 {
-	PLinkList pList;
+	PListNode pList;
 	printf("Test Remove begin\n");
 
 	InitSList(&pList);
@@ -1089,7 +1033,7 @@ void Test6()
 // Insert
 void Test7()
 {
-	PLinkList pList;
+	PListNode pList;
 	printf("Test Insert begin\n");
 
 	InitSList(&pList);
@@ -1106,8 +1050,8 @@ void Test7()
 // Erase
 void Test8()
 {
-	Node* del = 0;
-	PLinkList pList;
+	ListNode* del = 0;
+	PListNode pList;
 	printf("Test Erase begin\n");
 
 	InitSList(&pList);
@@ -1133,8 +1077,8 @@ void Test8()
 // Reverse
 void Test9()
 {
-	Node* del = 0;
-	PLinkList pList;
+	ListNode* del = 0;
+	PListNode pList;
 	printf("Test Reverse begin\n");
 
 	InitSList(&pList);
@@ -1155,8 +1099,8 @@ void Test9()
 // Sort & SortOP
 void Test10()
 {
-	Node* del = 0;
-	PLinkList pList;
+	ListNode* del = 0;
+	PListNode pList;
 	printf("Test Sort begin\n");
 
 	InitSList(&pList);
@@ -1238,7 +1182,7 @@ void Test10()
 	PrintSList(pList);
 
 	//BubbleSort(pList);
-	QucikSort_OP(pList, NULL);
+	QucikSort(pList);
 	PrintSList(pList);
 
 	DestorySList(&pList);
@@ -1248,10 +1192,10 @@ void Test10()
 // Merge
 void Test11()
 {
-	Node* del = 0;
-	PLinkList pList1;
-	PLinkList pList2;
-	PLinkList mergePList;
+	ListNode* del = 0;
+	PListNode pList1;
+	PListNode pList2;
+	PListNode mergePList;
 	printf("Test Merge begin\n");
 
 	InitSList(&pList1);
@@ -1273,8 +1217,8 @@ void Test11()
 
 	PrintSList(pList2);
 
-	BubbleSort(pList1, NULL);
-	BubbleSort(pList2, NULL);
+	BubbleSort(pList1);
+	BubbleSort(pList2);
 	mergePList = Merge(pList1, pList2);
 	PrintSList(mergePList);
 
@@ -1285,10 +1229,10 @@ void Test11()
 // MergeRecursive
 void Test12()
 {
-	Node* del = 0;
-	PLinkList pList1;
-	PLinkList pList2;
-	PLinkList mergePList;
+	ListNode* del = 0;
+	PListNode pList1;
+	PListNode pList2;
+	PListNode mergePList;
 	printf("Test MergeRecursive begin\n");
 
 	InitSList(&pList1);
@@ -1310,8 +1254,8 @@ void Test12()
 
 	PrintSList(pList2);
 
-	BubbleSort(pList1, NULL);
-	BubbleSort(pList2, NULL);
+	BubbleSort(pList1);
+	BubbleSort(pList2);
 	mergePList = MergeRecursive(pList1, pList2);
 	PrintSList(mergePList);
 
@@ -1322,8 +1266,8 @@ void Test12()
 // DelNonTailNode
 void Test13()
 {
-	Node* del = 0;
-	PLinkList pList;
+	ListNode* del = 0;
+	PListNode pList;
 	printf("Test DelMidNode begin\n");
 
 	InitSList(&pList);
@@ -1345,8 +1289,8 @@ void Test13()
 // InsertFrontNode
 void Test14()
 {
-	Node* n = 0;
-	PLinkList pList;
+	ListNode* n = 0;
+	PListNode pList;
 	printf("Test InsertFrontNode begin\n");
 
 	InitSList(&pList);
@@ -1368,8 +1312,8 @@ void Test14()
 // FindMidNode
 void Test15()
 {
-	Node* n = 0;
-	PLinkList pList;
+	ListNode* n = 0;
+	PListNode pList;
 	printf("Test FindMidNode begin\n");
 
 	InitSList(&pList);
@@ -1396,8 +1340,8 @@ void Test15()
 // DelKNode
 void Test16()
 {
-	Node* n = 0;
-	PLinkList pList;
+	ListNode* n = 0;
+	PListNode pList;
 	printf("Test DelKNode begin\n");
 
 	InitSList(&pList);
@@ -1419,10 +1363,10 @@ void Test16()
 void Test17()
 {
 	int length = 0;
-	Node* realEntry = 0, *getEntry = 0;
-	Node* end = 0;
-	PLinkList pList;
-	PLinkList meetNode = 0;
+	ListNode* realEntry = 0, *getEntry = 0;
+	ListNode* end = 0;
+	PListNode pList;
+	PListNode meetNode = 0;
 	printf("Test CheckCycle begin\n");
 
 	InitSList(&pList);
@@ -1460,8 +1404,8 @@ void Test17()
 // CheckCross
 void Test18()
 {
-	PLinkList pList1, pList2;
-	Node* realCrossNode, *end;
+	PListNode pList1, pList2;
+	ListNode* realCrossNode, *end;
 	printf("Test CheckCross begin\n");
 
 	InitSList(&pList1);
@@ -1501,8 +1445,8 @@ void Test18()
 // JosephCycle
 void Test19()
 {
-	Node* end;
-	PLinkList pList;
+	ListNode* end;
+	PListNode pList;
 	printf("Test JosephCycle begin\n");
 
 	InitSList(&pList);
