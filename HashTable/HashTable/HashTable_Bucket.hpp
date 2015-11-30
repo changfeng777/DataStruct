@@ -93,6 +93,9 @@ namespace BUCKET
 
 			// 1.begin为桶的头结点
 			Node* begin = _tables[index];
+			if (begin == NULL)
+				return false;
+
 			if (begin->_key == key)
 			{
 				_tables[index] = begin->_next;

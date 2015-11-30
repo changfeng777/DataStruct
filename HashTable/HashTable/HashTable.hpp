@@ -127,12 +127,6 @@ namespace ONE_DETECT
 			return key%_capaciy;
 		}
 
-		// 二次探测
-		size_t HashFunc2(size_t last, size_t i)
-		{
-			return last + (2*i - 1)%_capaciy;
-		}
-
 	private:
 		K*		_table;		// 哈希表内存块
 		Status* _status;	// 数据状态
@@ -298,11 +292,7 @@ namespace SECOND_DETECT
 		// 二次探测
 		size_t HashFunc2(size_t last, size_t i)
 		{
-			size_t ret = last + (2*i - 1)%_capaciy;
-			if (ret >= _capaciy)
-				ret %= _capaciy;
-
-			return ret;
+			return (last + (2*i - 1) % _capaciy);
 		}
 
 	private:
@@ -327,8 +317,8 @@ namespace SECOND_DETECT
 
 		ht1.Print();
 
-		ht1.Insert(25);
-		ht1.Print();
+		//ht1.Insert(25);
+		//ht1.Print();
 
 		ht1.Remove(10);
 		ht1.Remove(20);
