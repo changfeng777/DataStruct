@@ -1,0 +1,2 @@
+1:AutoPtr.hpp/ScopedPtr.hpp/SharedPtr.hpp是简单模拟实现库中的智能指针，初步探索SharedPtr的实现原理
+2：SharedPtr文件夹下展开深度剖析的shared_ptr的框架的并模拟实现了简化版的SharedPtr
