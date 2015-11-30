@@ -118,6 +118,10 @@ protected:
 	// 构建二叉树
 	void _CreateTree(BinaryTreeNode_Thd<T>*& root, const char*& str)
 	{
+		//
+		// ps:这里给char* str做输入仅仅是为了方便测试。
+		// 实际而言给char*的输入限制了T的类型。^^
+		//
 		if (*str != '\0' && *str != '#')
 		{
 			root = new BinaryTreeNode_Thd<T>(*str);

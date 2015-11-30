@@ -100,7 +100,10 @@ public:
 		// 1.parent指向父节点
 		int child = pos;
 		int parent = (child - 1) / 2;
-		while(parent >= 0)
+
+		// 当child==0时，则上调完成。不能使用parent来判断，parent不会小于0
+		//while(parent >= 0)
+		while(child > 0)
 		{
 			// 2.若child小于父节点，则交换父子节点，并继续向上调整，直到根节点
 			if (Compare()(vec[child], vec[parent]))
