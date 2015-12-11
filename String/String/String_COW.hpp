@@ -1,3 +1,23 @@
+/***********************************************************************************
+xxx.h:
+    Copyright (c) Bit Software, Inc.(2013), All rights reserved.
+
+Purpose: 实现String类的写时拷贝模型
+
+ps:学习String使用引用计数+Copy on Wirte计数实现浅拷贝来提高字符串拷贝的效率，不过当前实现的COW有一些问题
+1:健全的String所有可能写的接口都需要实现写时拷贝。Insert/PushBack...
+2:引用计数的线程安全问题。
+vs下STL中使用的是深拷贝的string
+gcc下的STL在gcc5.0以前使用的是COW，COW是双刃剑，一些场景下很高效，但是也会有坑！
+
+Author: xxx
+
+Reviser: yyy
+
+Created Time: 2015-4-26
+************************************************************************************/
+
+
 #include <Windows.h>
 
 namespace COW1
@@ -12,24 +32,24 @@ namespace COW1
 			_refCount = new int(1);
 		}
 
-		String(const String& str)
-			: _refCount(str._refCount)
-			, _str(str._str)
+		String(const String& s)
+			: _refCount(s._refCount)
+			, _str(s._str)
 		{
 			// 增加引用计数
 			++ _refCount[0];
 		}
 
-		String& operator =(const String& str )
+		String& operator =(const String& s)
 		{
-			if (this != &str)
+			if (this->_str != s._str)
 			{
 				// --旧的引用计数，如果是最后一个引用对象，则释放对象
 				_Release();
 
 				// 成员变量赋值，并增加引用计数
-				_str = str ._str;
-				_refCount = str ._refCount;
+				_str = s._str;
+				_refCount = s._refCount;
 				++ _refCount[0];
 			}
 
@@ -99,20 +119,20 @@ namespace COW2
 			strcpy(_str, str);
 		}
 
-		String(const String& str)
-			:_str(str._str)
+		String(const String& s)
+			:_str(s._str)
 		{
 			// 增加引用计数
 			++GetRefCount(_str);
 		}
 
-		String& operator=(const String& str)
+		String& operator=(const String& s)
 		{
-			if (this != &str)
+			if (this->_str != s._str)
 			{
 				Release(_str);
 
-				_str = str._str;
+				_str = s._str;
 
 				++GetRefCount(_str);
 			}
@@ -174,6 +194,7 @@ namespace COW2
 	};
 }
 
+// 测试基本的拷贝
 void TestString_COW1 ()
 {
 	COW1::String s1("hello world!");
@@ -217,10 +238,14 @@ void TestString_COW3()
 {
 	COW1::String s1("hello world!");
 	COW1::String s2 = s1;
+	COW1::String s3 = s2;
 
 	cout<<"s1:"<<(int*)s1.GetStr()<<endl;
 	cout<<"s2:"<<(int*)s2.GetStr()<<endl;
 	s2[0] = 'x';
 	cout<<"s1:"<<(int*)s1.GetStr()<<endl;
 	cout<<"s2:"<<(int*)s2.GetStr()<<endl;
+
+	// 读时也拷贝
+	cout<<s3[0]<<endl;
 };
