@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 
 namespace BUCKET
 {
@@ -29,7 +30,44 @@ namespace BUCKET
 		1610612741ul, 3221225473ul, 4294967291ul
 	};
 
-	template<class K, class V>
+	template<class K>
+	struct __HashFunc
+	{
+		size_t operator()(const K& t)
+		{
+			return t;
+		}
+	};
+
+	//
+	// 特化string类型，方便后续测试字典
+	// 若需支持其他类型，也一样可使用特化的方式
+	//
+	template<>
+	struct __HashFunc<string>
+	{
+		static size_t BKDRHash(const char *str)
+		{
+			unsigned int seed = 131; // 31 131 1313 13131 131313
+			unsigned int hash = 0;
+
+			while (*str)
+			{
+				hash = hash * seed + (*str++);
+			}
+
+			return (hash & 0x7FFFFFFF);
+		}
+
+		size_t operator()(const string& s)
+		{
+			return BKDRHash(s.c_str());
+		}
+	};
+
+	//template<class K, class V, class HashFunc, class EqualKey>
+	//template<class K, class V, class HashFunc>
+	template<class K, class V, template<class> class HashFunc = __HashFunc>
 	class HashTable
 	{
 	public:
@@ -42,7 +80,12 @@ namespace BUCKET
 		~HashTable()
 		{}
 
+		HashTable(const HashTable& ht);
+		HashTable& operator=(const HashTable& ht);
+
 	public:
+		//InsertUnique
+		//InsertEquel
 		bool Insert(const K& key, const V& value)
 		{
 			_CheckCapacity(_size + 1);
@@ -137,7 +180,8 @@ namespace BUCKET
 
 				while(begin)
 				{
-					printf("{%d,%.2f}->", begin->_key, begin->_value);
+					//printf("{%d,%.2f}->", begin->_key, begin->_value);
+					cout<<"{"<<begin->_key<<","<<begin->_value<<"}->";
 					begin = begin->_next;
 				}
 
@@ -208,22 +252,22 @@ namespace BUCKET
 		size_t _HashFunc(const K& key, size_t capacity)
 		{
 			//
-			// 作为模板类型HashTable，这里其实需要考虑对泛型key的处理
-			// 需添加仿函数的HashFunc/Equal模板参数对key进行处理，这样
-			// 才是标准模板的哈希表，这里考虑到本模板只用于教学，重点
-			// 在于学习Hash桶的增删查改逻辑，暂时实现为这样，后续若有必要
-			// 再进行改进。
+			// 计算key Hash值仿函数对象，让程序的扩展性更强
 			//
-			return key % capacity;
+			//return _hash(key) % capacity;
+			return HashFunc<K>()(key) % capacity;
 		}
 
 	protected:
 		vector<Node*> _tables;
 		size_t _size;
+
+		//HashFunc _hash;		// 计算hash值的仿函数对象
+		//EqualKey _equal;		// 计算key值相等的仿函数
 	};
 
 	// 插入/查找/删除
-	void Test1()
+	void TestSome()
 	{
 		HashTable<int, double> ht1;
 		ht1.Insert(1,1);
@@ -254,10 +298,16 @@ namespace BUCKET
 		ht1.Remove(3);
 
 		ht1.Print();
+		
+		// 测试字典
+		HashTable<string, string> dict;
+		dict.Insert("tree", "树");
+		dict.Insert("flower", "花");
+		dict.Print();
 	}
 
 	// 测试哈希表扩张重建
-	void Test2()
+	void TestRebuilt()
 	{
 		HashTable<int, double> ht1;
 		ht1.Insert(53,53);
@@ -284,7 +334,7 @@ namespace BUCKET
 	#include <time.h>
 
 	// 随机数据测试哈希表的负载
-	void Test3()
+	void TestOp()
 	{
 		HashTable<int, double> ht1;
 		srand(time(0));
