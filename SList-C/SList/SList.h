@@ -1,3 +1,16 @@
+/***********************************************************************************
+xxx.h:
+    Copyright (c) Bit Software, Inc.(2013), All rights reserved.
+
+Purpose: C语言实现单链表--不带头结点实现
+
+Author: xxx
+
+Reviser: yyy
+
+Created Time: 2015-4-26
+************************************************************************************/
+
 #pragma once
 
 #include<stdio.h>
@@ -13,12 +26,9 @@ typedef struct ListNode
 	struct ListNode* _next;		// 指向下一个节点的指针
 }ListNode, *PListNode;
 
-//typedef struct ListNode  ListNode;
-//typedef struct ListNode* PListNode;
-
 //
 // ps:PushBack/PopBack等接口的参数使用PListNode*的二级指针做参数，
-// 可以先讲解修改链表时为什么要用二级指针，后续为了方便可以改用引用替代。
+// 可以先讲解修改链表数据时为什么要用二级指针，后续简单介绍一下引用，为了方便可以改用引用替代
 // 如：void PushBack (PListNode& ppList, DataType x);
 //
 
@@ -162,7 +172,10 @@ void PushFront (PListNode* ppList, DataType x)
 
 	n = CreateNode(x);
 
-	// 1：没有节点 or 一个以上
+	//
+	// 1：没有节点
+	// 2：一个或以上节点
+	// 
 	if (*ppList == NULL)
 	{
 		*ppList = n;
@@ -179,13 +192,13 @@ void PopFront (PListNode* ppList)
 	ListNode* n = 0;
 	assert(ppList);
 
-	// 没有节点
+	// 1.没有节点
 	if (*ppList == NULL)
 	{
 		return;
 	}
 
-	// 一个节点
+	// 2.一个节点
 	if((*ppList)->_next == NULL)
 	{
 		free(*ppList);
@@ -193,7 +206,7 @@ void PopFront (PListNode* ppList)
 		return;
 	}
 
-	// 两个节点以上
+	// 3.两个节点以上
 	n = *ppList;
 	*ppList = n->_next;
 	free(n);
@@ -216,6 +229,26 @@ ListNode* Find (PListNode ppList, DataType x)
 	}
 
 	return 0;
+}
+
+void Erase (PListNode* ppList, ListNode* n)
+{
+	ListNode* del = 0;
+	assert(ppList);
+	assert(n);
+
+	// 处理尾节点的情况
+	if(n->_next == 0)
+	{
+		PopBack(ppList);
+		return;
+	}
+
+	// 将n的下一个next节点的值赋值给n， 删除n的next节点。
+	n->_data = n->_next->_data;
+	del = n->_next;
+	n->_next = n->_next->_next;
+	free(del);
 }
 
 int Remove (PListNode* ppList, DataType x)
@@ -273,27 +306,6 @@ void Insert (PListNode* ppList, ListNode* n, DataType x)
 		n->_next = tmp;
 	}
 }
-
-void Erase (PListNode* ppList, ListNode* n)
-{
-	ListNode* del = 0;
-	assert(ppList);
-	assert(n);
-
-	// 处理尾节点的情况
-	if(n->_next == 0)
-	{
-		PopBack(ppList);
-		return;
-	}
-
-	// 将n的下一个next节点的值赋值给n， 删除n的next节点。
-	n->_data = n->_next->_data;
-	del = n->_next;
-	n->_next = n->_next->_next;
-	free(del);
-}
-
 
 //////////////////////////////////////////////////////////////////////////////////////
 // 链表相关面试题
