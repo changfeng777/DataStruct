@@ -1,5 +1,8 @@
 #pragma once
 
+// 简单实现自动释放智能指针
+// ps：分析以后可以发现AutoPtr拷贝对象时有非常大的缺陷，拷贝后会留下空智能指针对象的隐患
+
 template <class T>
 class AutoPtr
 {

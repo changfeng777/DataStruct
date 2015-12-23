@@ -1,8 +1,9 @@
 #pragma once
 
 //
-// 模拟最初版的shared_ptr的设计，不考虑线程安全和循环引用等问题。
+// 简单模拟最初版的shared_ptr的设计，这里不考虑线程安全和循环引用等问题。
 //
+
 namespace ONE
 {
 	template <class T>
@@ -133,7 +134,7 @@ namespace ONE
 			return *this ;
 		}
 
-		T* GetPtr ()
+		T* Get()
 		{
 			return _ptr ;
 		}
@@ -170,17 +171,17 @@ namespace ONE
 	void TestSharedArray()
 	{
 		SharedArray<int > p1 = new int [20];
-		cout<<"p1->count:" <<p1. GetCount()<<endl ;
+		cout<<"p1->count:" <<p1.GetCount()<<endl ;
 
 		SharedArray<int > p2 = p1;
-		cout<<"p1->count:" <<p1. GetCount()<<" " ;
-		cout<<"p2->count:" <<p2. GetCount()<<endl ;
+		cout<<"p1->count:" <<p1.GetCount()<<" " ;
+		cout<<"p2->count:" <<p2.GetCount()<<endl ;
 
 		SharedArray<int > p3;
 		p3 = p2 ;
-		cout<<"p1->count:" <<p1. GetCount()<<" " ;
-		cout<<"p2->count:" <<p2. GetCount()<<" " ;
-		cout<<"p3->count:" <<p3. GetCount()<<endl ;
+		cout<<"p1->count:" <<p1.GetCount()<<" " ;
+		cout<<"p2->count:" <<p2.GetCount()<<" " ;
+		cout<<"p3->count:" <<p3.GetCount()<<endl ;
 
 		p1[1] = 1;
 		p3[2] = 2;

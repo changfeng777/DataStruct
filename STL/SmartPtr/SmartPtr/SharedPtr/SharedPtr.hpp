@@ -1,10 +1,31 @@
+/***********************************************************************************
+xxx.h:
+    Copyright (c) Bit Software, Inc.(2013), All rights reserved.
+
+Purpose: 模拟实现boost/shared_ptr实现SharedPtr
+主要用学习shared_ptr的源码，去除shared_ptr繁茂的枝叶，理清内部实现。
+思考它为什么要这么实现？提升对象智能指针的理解，提升C++和软件设计的功力
+ps:本来还应该包含weak_ptr的嵌套设计，不过如果把当前这部分理清楚了，再去看weak_ptr
+部分的设计已经不再有问题。
+
+Author: xujinghang
+
+Reviser: xxx
+
+Created Time: 2015-4-26
+************************************************************************************/
+
+#pragma once
+#define __SMART_PTR_DEBUG__
+
 namespace SECOND
 {
+	// 引用计数基类设计为抽象类
 	class SPCountedBase
 	{
 	public :
 		SPCountedBase(long count = 1)
-			: _count(count )
+			: _count(count)
 		{}
 
 		virtual ~SPCountedBase ()
@@ -63,20 +84,25 @@ namespace SECOND
 		virtual void Destory()
 		{
 			delete this;
+
+#ifdef __SMART_PTR_DEBUG__
+			printf("【释放引用计数对象】:0x%p\n", this);
+#endif
 		}
 
 		virtual void Dispose()
 		{
 			if(_px )
 			{
-	#ifdef __SMART_PTR_DEBUG__
-				cout<<"delete:" <<_px<< endl;
-	#endif
+#ifdef __SMART_PTR_DEBUG__
+				printf("【delete对象】:0x%p\n", _px);
+#endif
 				delete _px ;
 			}
 		}
 
 	private :
+		// 拷贝函数声明为私有防拷贝
 		SPCountedImpl_P(const SPCountedImpl_P&);
 		SPCountedImpl_P& operator =(const SPCountedImpl_P &);
 
@@ -89,7 +115,7 @@ namespace SECOND
 	class SPCountedImpl_PD : public SPCountedBase
 	{
 	public :
-		SPCountedImpl_PD(T * ptr, const D & d)
+		SPCountedImpl_PD(T * ptr, D d)
 			: _px(ptr )
 			, _d(d )
 		{}
@@ -97,7 +123,11 @@ namespace SECOND
 		// 重写删除释放对象和释放引用计数对象的虚函数
 		virtual void Destory()
 		{
-			delete this ;
+			delete this;
+
+#ifdef __SMART_PTR_DEBUG__
+			printf("【释放引用计数对象】:0x%p\n", this);
+#endif
 		}
 
 		virtual void Dispose()
@@ -105,7 +135,7 @@ namespace SECOND
 			if(_px )
 			{
 	#ifdef __SMART_PTR_DEBUG__
-				cout<<"delete:" <<_px<< endl;
+				printf("【定置删除器删除对象】deleter:0x%p\n", _px);
 	#endif
 				// 使用定置的删除器进行删除
 				_d(_px );
@@ -120,7 +150,8 @@ namespace SECOND
 	template <class T, class D, class A >
 	class SPCountedImpl_PDA : public SPCountedBase
 	{
-		SPCountedImpl_PDA(T * ptr, const D & d, const A& a )
+	public:
+		SPCountedImpl_PDA(T * ptr, D d, A a )
 			: _px(ptr )
 			, _d(d )
 			, _a(a )
@@ -134,7 +165,11 @@ namespace SECOND
 			// 思考这里为什么手动调用析构函数?而在前面只需要调用delete？
 			//
 			this->~SPCountedImpl_PDA <T, D,A >();
-			_a.deallocate (this, 1);
+			_a.deallocate ((int*)this, sizeof(SPCountedImpl_PDA)/4);
+
+#ifdef __SMART_PTR_DEBUG__
+			printf("【空间配置器释放引用计数对象】:0x%p\n", this);
+#endif
 		}
 
 		virtual void Dispose()
@@ -142,7 +177,7 @@ namespace SECOND
 			if(_px )
 			{
 	#ifdef __SMART_PTR_DEBUG__
-				cout<<"delete:" <<_px<< endl;
+				printf("【定置删除器删除对象】:0x%p\n", _px);
 	#endif
 				// 使用定置的删除进行删除
 				_d(_px );
@@ -158,21 +193,27 @@ namespace SECOND
 	class SharedCount
 	{
 	public :
-		template<class T>
-		SharedCount(T * ptr)
+		template<class P>
+		SharedCount(P* px)
 		{
-			pi_ = new SPCountedImpl_P< T>(ptr);
+			pi_ = new SPCountedImpl_P<P>(px);
+#ifdef __SMART_PTR_DEBUG__
+			printf("【new引用计数对象】:0x%p\n", pi_);
+#endif
 		}
 		
 		//
 		// 这里的D d为定置的删除器对象
 		// 当管理的指针对象不是new分配的时，则需要用定置的删除器
-		// 如: malloc/free 、 fopen/fclose等
+		// 如: malloc/free -- fopen/fclose等
 		//
-		template<class T, class D >
-		SharedCount(T * ptr, D& d )
+		template<class P, class D >
+		SharedCount(P * ptr, D d )
 		{
-			pi_ = new SPCountedImpl_PD <T, D>(ptr , d);
+			pi_ = new SPCountedImpl_PD <P, D>(ptr , d);
+#ifdef __SMART_PTR_DEBUG__
+			printf("【new引用计数对象】:0x%p\n", pi_);
+#endif
 		}
 
 		//
@@ -180,11 +221,14 @@ namespace SECOND
 		// <2>:这里的A a为定置的内存分配器对象。
 		// 防止大量使用指针指针的场景下，分配大量引用计数对象引发内存碎片问题
 		//
-		template<class T, class D , class A>
-		SharedCount(T * ptr, D& d , A& a)
+		template<class P, class D , class A>
+		SharedCount(P* px, D d , A a)
 		{
-			pi_ = a.allocate(1);
-			new(pi_)SPCountedImpl_PD<T,D,A>(ptr, d, a);
+			pi_ = (SPCountedBase*)a.allocate(sizeof(SPCountedImpl_PDA<P,D,A>)/4);
+			new(pi_)SPCountedImpl_PDA<P,D,A>(px, d, a);
+#ifdef __SMART_PTR_DEBUG__
+			printf("【空间配置器分配引用计数对象，并使用new定位表达式初始化】:0x%p\n", pi_);
+#endif
 		}
 
 		~ SharedCount()
@@ -231,17 +275,36 @@ namespace SECOND
 	class SharedPtr
 	{
 	public :
-		explicit SharedPtr(T * ptr = NULL)
-			: _pn(ptr )
-			, _px(ptr )
+		explicit SharedPtr(T * px = NULL)
+			: _pn(px)
+			, _px(px)
 		{
 	// __SMART_PTR_DEBUG__宏用于调试时观察是否初始化和释放对象。
 	#ifdef __SMART_PTR_DEBUG__
-			if (_px )
-			{
-				cout<<"new:" <<_px<< endl;
-			}
+			printf("【构造智能指针对象管理指针】:0x%p\n", _px);
 	#endif
+		}
+
+		template<class D>
+		SharedPtr(T* px, D d)
+			: _pn(px, d)
+			, _px(px)
+		{
+			// __SMART_PTR_DEBUG__宏用于调试时观察是否初始化和释放对象。
+#ifdef __SMART_PTR_DEBUG__
+			printf("【构造智能指针对象管理指针】:0x%p\n", _px);
+#endif
+		}
+
+		template<class D, class A>
+		SharedPtr(T* px, D d, A a)
+			: _pn(px, d, a)
+			, _px(px)
+		{
+			// __SMART_PTR_DEBUG__宏用于调试时观察是否初始化和释放对象。
+#ifdef __SMART_PTR_DEBUG__
+			printf("【构造智能指针对象管理指针】:0x%p\n", _px);
+#endif
 		}
 
 		~ SharedPtr()
@@ -280,7 +343,7 @@ namespace SECOND
 
 		T& operator* ()
 		{
-			return *_px ;
+			return *_px;
 		}
 
 		T* operator->()
@@ -307,5 +370,34 @@ namespace SECOND
 		cout<<"p1->count:" <<p1. GetCount()<<" ";
 		cout<<"p2->count:" <<p2. GetCount()<<" ";
 		cout<<"p3->count:" <<p3. GetCount()<<endl;
+	}
+
+	class FClose
+	{
+	public :
+		void operator() (void* ptr)
+		{
+			fclose((FILE *)ptr);
+		}
+	};
+
+	// 定置的删除器仿函数
+	class Free
+	{
+	public :
+		void operator() (void* ptr)
+		{
+			free(ptr );
+		}
+	};
+
+
+	void TestSharedPtr_DA()
+	{
+		// 定制删除器
+		SharedPtr<FILE> p1(fopen("test.txt" , "w"), FClose());
+
+		// 定制删除器和分配器
+		SharedPtr<int> p2((int*)malloc(sizeof (int)), Free(), allocator<int>());
 	}
 }

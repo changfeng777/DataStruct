@@ -1,5 +1,7 @@
 #pragma once
 
+// 简单实现防拷贝版的智能指针
+
 template <class T>
 class ScopedPtr
 {
