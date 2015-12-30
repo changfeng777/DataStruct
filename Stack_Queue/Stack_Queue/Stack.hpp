@@ -1,7 +1,9 @@
 /******************************************************************************************
 Copyright (c) Bit Software, Inc.(2013), All rights reserved.
 
-Purpose: 使用动态数组方式实现栈   
+Purpose:
+1：使用动态数组方式实现栈 
+2：另外考虑使用顺序表实现适配器模式的栈（这部分在C++模板部分已讲解过）
 
 Author: xjh
 
@@ -31,23 +33,59 @@ public:
 	}
 
 public:
-	void Push(const T& x);
-	void Pop();
-	const T& Top();
-	size_t Size();
-	bool Empty();
+	void Push(const T& x)
+	{
+		_CheckCapacity();
+		_data[_size++] = x;
+	}
+
+	void Pop()
+	{
+		assert(_size > 0);
+		--_size;
+	}
+
+	const T& Top()
+	{
+		assert(_size > 0);
+		return _data[_size - 1];
+	}
+
+	size_t Size()
+	{
+		return _size;
+	}
+
+	bool Empty()
+	{
+		return _size == 0;
+	}
 
 	void Print()
 	{
-		//for (int i = 0; i < _size; ++i)
+		for (int i = 0; i < _size; ++i)
 		{
-			//cout<<_data[i]<<"->";
+			cout<<_data[i]<<"->";
 		}
-		cout<<"Stack Top";
 	}
 
 private:
-	void _CheckExpandCapacity();
+	void _CheckCapacity()
+	{
+		if (_capacity == _size)
+		{
+			T* tmp = new T[2*_capacity];
+			//
+			// 如果T是自定类型的考虑深浅拷贝的问题
+			// 当T是string等类型时得用operator=
+			//
+			memcpy(tmp, _data, _size*sizeof(T));
+			_capacity *= 2;
+
+			delete[] _data;
+			_data = tmp;
+		}
+	}
 
 private:
 	size_t _size;		// 数据的个数
@@ -55,55 +93,6 @@ private:
 
 	T* _data;			// 指向数据块的指针
 };
-
-template<class T>
-void Stack<T>::_CheckExpandCapacity()
-{
-	if (_capacity == _size)
-	{
-		T* tmp = new T[2*_capacity];
-		memcpy(tmp, _data, _size*sizeof(T));
-		_capacity *= 2;
-
-		delete[] _data;
-		_data = tmp;
-	}
-}
-
-
-template<class T>
-void Stack<T>::Push(const T& x)
-{
-	_CheckExpandCapacity();
-
-	_data[_size++] = x;
-}
-
-template<class T>
-void Stack<T>::Pop()
-{
-	assert(_size > 0);
-	--_size;
-}
-
-template<class T>
-const T& Stack<T>::Top()
-{
-	assert(_size > 0);
-	return _data[_size - 1];
-}
-
-template<class T>
-size_t Stack<T>::Size()
-{
-	return _size;
-}
-
-template <class T>
-bool Stack<T>::Empty()
-{
-	return _size == 0;
-}
 
 void TestStack()
 {
