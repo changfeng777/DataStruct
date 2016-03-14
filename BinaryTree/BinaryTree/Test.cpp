@@ -24,10 +24,7 @@ int main()
 
 	//TestHuffmanTree_A();
 	//TestCompress();
-
 	//TestBSTree();
-
-	cout<<(0-1)/2<<endl;
 
 	return 0;
 }

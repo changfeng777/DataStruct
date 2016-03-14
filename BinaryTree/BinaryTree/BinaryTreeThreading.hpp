@@ -1,7 +1,7 @@
 /******************************************************************************************
 Copyright (c) Bit Software, Inc.(2013), All rights reserved.
 
-Purpose: 二叉树的中序线索化
+Purpose: 二叉树的前/中/后序线索化
 
 Author: xjh
 
@@ -15,16 +15,16 @@ Created Time: 2015-8-6
 enum PointerTag {THREAD, LINK};
 
 template<class T>
-struct BinaryTreeNode_Thd
+struct BinaryTreeNodeThd
 {
 	T _data;						// 数据
-	BinaryTreeNode_Thd<T>* _left;	// 左孩子
-	BinaryTreeNode_Thd<T>* _right;	// 右孩子
-	BinaryTreeNode_Thd<T>* _parent;	// 父节点（为后序遍历的线索化而生）
+	BinaryTreeNodeThd<T>* _left;	// 左孩子
+	BinaryTreeNodeThd<T>* _right;	// 右孩子
+	BinaryTreeNodeThd<T>* _parent;	// 父节点（为后序遍历的线索化而生）
 	PointerTag	_leftTag;			// 左孩子线索标志
 	PointerTag	_rightTag;			// 右孩子线索标志
 
-	BinaryTreeNode_Thd(const T& x)
+	BinaryTreeNodeThd(const T& x)
 		:_data(x)
 		,_left(NULL)
 		,_right(NULL)
@@ -35,40 +35,39 @@ struct BinaryTreeNode_Thd
 };
 
 template<class T>
-class BinaryTree_Thd
+class BinaryTreeThd
 {
 public:
-	BinaryTree_Thd()
+	BinaryTreeThd()
 		:_root(NULL)
 	{}
 
-	BinaryTree_Thd(const char* array)
+	/*BinaryTreeThd(const char* array1)
 	{
-		_CreateTree(_root, array);
-	}
+		_CreateTree(_root, array1);
+	}*/
 
-	// 1.创建二叉树
-	/*void CreateTree(T array[], size_t size)
+	BinaryTreeThd(T array[], size_t size)
 	{
 		int index = 0;
 		_CreateTree(_root, array, size, index);
-	}*/
+	}
 
 	void InThreading()
 	{
-		BinaryTreeNode_Thd<T>* prev = NULL;
+		BinaryTreeNodeThd<T>* prev = NULL;
 		_InThreading(_root, prev);
 	}
 
 	void PrevThreading()
 	{
-		BinaryTreeNode_Thd<T>* prev = NULL;
+		BinaryTreeNodeThd<T>* prev = NULL;
 		_PrevThreading(_root, prev);
 	}
 
 	void PostThreading()
 	{
-		BinaryTreeNode_Thd<T>* prev = NULL;
+		BinaryTreeNodeThd<T>* prev = NULL;
 		_PostThreading(_root, prev);
 	}
 
@@ -94,55 +93,55 @@ public:
 	}
 
 protected:
-	//// 构建二叉树
-	//void _CreateTree(BinaryTreeNode_Thd<T>*& root, T array[], size_t size, int& index)
-	//{
-	//	if (index < size && array[index] != '#')
-	//	{
-	//		root = new BinaryTreeNode_Thd<T>(array[index]);
-	//		_CreateTree(root->_left, array, size, ++index);
-	//		_CreateTree(root->_right, array, size, ++index);
-
-	//		if (root->_left)
-	//		{
-	//			root->_left->_parent = root;
-	//		}
-
-	//		if (root->_right)
-	//		{
-	//			root->_right->_parent = root;
-	//		}
-	//	}
-	//}
-
 	// 构建二叉树
-	void _CreateTree(BinaryTreeNode_Thd<T>*& root, const char*& str)
+	void _CreateTree(BinaryTreeNodeThd<T>*& root, T array1[], size_t size, int& index)
 	{
-		//
-		// ps:这里给char* str做输入仅仅是为了方便测试。
-		// 实际而言给char*的输入限制了T的类型。^^
-		//
-		if (*str != '\0' && *str != '#')
+		if (index < size && array1[index] != '#')
 		{
-			root = new BinaryTreeNode_Thd<T>(*str);
-			_CreateTree(root->_left, ++str);
+			root = new BinaryTreeNodeThd<T>(array1[index]);
+			_CreateTree(root->_left, array1, size, ++index);
+			_CreateTree(root->_right, array1, size, ++index);
+
 			if (root->_left)
 			{
 				root->_left->_parent = root;
 			}
 
-			if (*str == '\0')
-				return;
-
-			_CreateTree(root->_right, ++str);
 			if (root->_right)
 			{
 				root->_right->_parent = root;
 			}
 		}
+	//}
+
+	// 构建二叉树
+	//void _CreateTree(BinaryTreeNodeThd<T>*& root, const char*& str)
+	//{
+	//	//
+	//	// ps:这里给char* str做输入仅仅是为了方便测试。
+	//	// 实际而言给char*的输入限制了T的类型。^^
+	//	//
+	//	if (*str != '\0' && *str != '#')
+	//	{
+	//		root = new BinaryTreeNodeThd<T>(*str);
+	//		_CreateTree(root->_left, ++str);
+	//		if (root->_left)
+	//		{
+	//			root->_left->_parent = root;
+	//		}
+
+	//		if (*str == '\0')
+	//			return;
+
+	//		_CreateTree(root->_right, ++str);
+	//		if (root->_right)
+	//		{
+	//			root->_right->_parent = root;
+	//		}
+	//	}
 	}
 
-	void _InThreading(BinaryTreeNode_Thd<T>* cur, BinaryTreeNode_Thd<T>*& prev)
+	void _InThreading(BinaryTreeNodeThd<T>* cur, BinaryTreeNodeThd<T>*& prev)
 	{
 		if (cur)
 		{
@@ -170,7 +169,7 @@ protected:
 		}
 	}
 
-	void _PrevThreading(BinaryTreeNode_Thd<T>* cur, BinaryTreeNode_Thd<T>*& prev)
+	void _PrevThreading(BinaryTreeNodeThd<T>* cur, BinaryTreeNodeThd<T>*& prev)
 	{
 		if(cur)
 		{
@@ -199,7 +198,7 @@ protected:
 		}
 	}
 
-	void _PostThreading(BinaryTreeNode_Thd<T>* cur, BinaryTreeNode_Thd<T>*& prev)
+	void _PostThreading(BinaryTreeNodeThd<T>* cur, BinaryTreeNodeThd<T>*& prev)
 	{
 		if(cur)
 		{
@@ -228,7 +227,7 @@ protected:
 		}
 	}
 
-	void _InOrder(BinaryTreeNode_Thd<T>* cur)
+	void _InOrder(BinaryTreeNodeThd<T>* cur)
 	{
 		while(cur)
 		{
@@ -252,7 +251,7 @@ protected:
 		}
 	}
 
-	void _PrevOrder(BinaryTreeNode_Thd<T>* cur)
+	void _PrevOrder(BinaryTreeNodeThd<T>* cur)
 	{
 		while(cur)
 		{
@@ -268,28 +267,33 @@ protected:
 			}
 
 			// 访问连接在一起的后继节点
-			while (cur->_rightTag == THREAD && cur->_right)
+			/*while (cur->_rightTag == THREAD && cur->_right)
 			{
 				cur = cur->_right;
 				cout<<cur->_data<<" ";
 			}
+			cur = cur->_right;*/
 
+			//
+			// 不论是Thread后继节点，还是右子树都直接跳转过去访问
+			// 所有节点都当成二叉树的左路节点来访问
+			//
 			cur = cur->_right;
 		}
 	}
 
-	void _PostOrder(BinaryTreeNode_Thd<T>* root)
+	void _PostOrder(BinaryTreeNodeThd<T>* root)
 	{
-		BinaryTreeNode_Thd<T>* cur = NULL;
-		BinaryTreeNode_Thd<T>* visited = NULL;
+		BinaryTreeNodeThd<T>* cur = NULL;
+		BinaryTreeNodeThd<T>* prev = NULL;
 
 		if (root)
 			cur = root->_left;
 
-		while (cur != root)
+		while (cur)
 		{
-			// 走左子树
-			while (cur && cur->_leftTag == LINK && cur->_left != visited)
+			// 走左子树，先找到最左节点
+			while (cur && cur->_leftTag == LINK)
 			{
 				cur = cur->_left;
 			}
@@ -298,7 +302,7 @@ protected:
 			while(cur && cur->_rightTag == THREAD)
 			{
 				cout<<cur->_data<<" ";
-				visited = cur;
+				prev = cur;
 
 				cur = cur->_right;
 			}
@@ -306,14 +310,14 @@ protected:
 			if (cur == root)
 			{
 				cout<<cur->_data<<" ";
-				return;
+				break;
 			}
 
 			// 如果当前节点的右节点已访问，则跳到父节点
-			while(cur && cur->_right == visited)
+			while(cur && cur->_right == prev)
 			{
 				cout<<cur->_data<<" ";
-				visited = cur;
+				prev = cur;
 
 				cur = cur->_parent;			
 			}
@@ -325,32 +329,38 @@ protected:
 	}
 
 private:
-	BinaryTreeNode_Thd<T>* _root;
+	BinaryTreeNodeThd<T>* _root;
 };
 
 
 // 测试线索化二叉树
 void TestBinaryTreeThd()
 {
-	/*int array[20] = {1, 2, 3, '#', '#', 4, '#', '#', 5, 6};
-	BinaryTree_Thd<int> tree;
-	tree.CreateTree(array, 10);*/
+	int array1[20] = {1, 2, 3, '#', '#', 4, '#', '#', 5, 6};
+	BinaryTreeThd<int> t1(array1, 10);
+	t1.InThreading();
+	t1.InOrder();
 
-	// HDA##C#B##GF#E
+	BinaryTreeThd<int> t2(array1, 10);
+	t2.PrevThreading();
+	t2.PrevOrder();
 
-	//char* str = "HDA##C#B##GF#E";
-	char* str = "123##4##56";
-	BinaryTree_Thd<char> tree(str);
+	BinaryTreeThd<int> t3(array1, 10);
+	t3.PostThreading();
+	t3.PostOrder();
 
-	
-	//tree.InOrder();
+	cout<<"==================================="<<endl;
 
-	//tree.InThreading();
-	//tree.InOrder();
+	int array2[15] = {1,2,'#',3,'#','#',4,5,'#',6,'#',7,'#','#',8};
+	BinaryTreeThd<int> t4(array2, 15);
+	t4.InThreading();
+	t4.InOrder();
 
-	//tree.PrevThreading();
-	//tree.PrevOrder();
+	BinaryTreeThd<int> t5(array2, 15);
+	t5.PostThreading();
+	t5.PostOrder();
 
-	tree.PostThreading();
-	tree.PostOrder();
+	BinaryTreeThd<int> t6(array2, 15);
+	t6.PrevThreading();
+	t6.PrevOrder();
 }
