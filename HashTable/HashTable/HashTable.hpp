@@ -42,6 +42,11 @@ namespace ONE_DETECT
 		}
 
 	public:
+		//
+		// 此处应该考虑当_size/_capacity的负载因子到达一定数值(0.8)以后
+		// 进行扩容，并对原数据进行重新哈希负载。
+		// (逻辑也比较简单，暂未实现，待后续补充）
+		//
 		bool Insert(const K& key)
 		{
 			if (_size == _capaciy)
@@ -204,6 +209,11 @@ namespace SECOND_DETECT
 	public:
 		bool Insert(const K& key)
 		{
+			//
+			// 此处应该考虑当_size/_capacity的负载因子到达一定数值(0.8)以后
+			// 进行扩容，并对原数据进行重新哈希负载。
+			// (逻辑也比较简单，暂未实现，待后续补充）
+			//
 			if (_size == _capaciy)
 			{
 				cout<<"Hash Table Is Full\n"<<endl;
@@ -292,7 +302,7 @@ namespace SECOND_DETECT
 		// 二次探测
 		size_t HashFunc2(size_t last, size_t i)
 		{
-			return (last + (2*i - 1) % _capaciy);
+			return (last + (2*i - 1))% _capaciy;
 		}
 
 	private:
