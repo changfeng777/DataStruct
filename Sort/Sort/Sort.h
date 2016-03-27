@@ -532,8 +532,8 @@ void _MergeSort_R_OP(int* src, int* dst, int left, int right)
 		return;
 
 	// 当区间比较小时，使用插入排序减少递归更高效一些
-	//if (right - left < 13)
-	if (right - left < 5)
+	if (right - left < 13)
+	//if (right - left < 5)
 	{
 		InsertSort(src+left, right - left);
 		return;
@@ -598,12 +598,6 @@ void CountSort(int* array, int size)
 	delete[] count;
 }
 
-int getDigit(int x, int d)
-{
-	int a[] = { 1, 1, 10, 100 }; // 本实例中的最大数是百位数，所以只要到100就可以了
-	return ((x / a[d]) % 10);
-}
-
 int _GetMaxBit(int* array, int size)
 {
 	int bit = 1;
@@ -624,13 +618,16 @@ void RadixSort_LSD(int* array, int size)
 {
 	int maxBit = _GetMaxBit(array, size);
 	int* bucket = new int[size];
-	int* count = new int[10];
 	memset(bucket, 0, sizeof(int)*size);
+
+	int count[10] = {0};
+	int start[10] = {0};
 
 	int radix = 1;
 	for (int bit = 1; bit <= maxBit; ++bit)
 	{
 		memset(count, 0, sizeof(int)*10);
+		memset(start, 0, sizeof(int)*10);
 		
 		// 确定对应位桶数据的个数，及确定在桶中的位置
 		for (int i = 0; i < size; ++i)
@@ -640,15 +637,14 @@ void RadixSort_LSD(int* array, int size)
 		}
 		for (int i = 1; i < 10; ++i)
 		{
-			count[i] = count[i] + count[i-1];
+			start[i] = start[i-1] + count[i-1];
 		}
 
 		// 将数据放到对应的桶中
-		for (int i = size - 1; i >= 0; --i)
+		for (int i = 0; i < size; ++i)
 		{
 			int k = (array[i]/radix) % 10;
-			bucket[count[k] - 1] = array[i];
-			count[k]--;
+			bucket[start[k]++] = array[i];
 		}
 
 		// 将桶中排后数据拷贝回原数组
@@ -657,7 +653,6 @@ void RadixSort_LSD(int* array, int size)
 		radix *= 10;
 	}
 
-	delete [] count;
 	delete [] bucket;
 }
 
@@ -718,7 +713,8 @@ void _RadixSort_MSD(int* array, int left, int right, int bit, int* bucket, int* 
 void RadixSort_MSD(int* array, int size)
 {
 	int maxBit = _GetMaxBit(array, size);
-	int* bucket = new int[size];                                                          int* count = new int[10];
+	int* bucket = new int[size];
+	int* count = new int[10];
 
 	_RadixSort_MSD(array, 0, size, maxBit, bucket, count);
 
@@ -832,11 +828,11 @@ void Test9()
 {
 	cout<<"RadixSort:"<<endl;
 
-	int array[SIZE] = {21, 51, 22, 26, 300, 6, 240, 7, 10, 10};
+	int array[SIZE] = {21, 51, 22, 26000, 300, 6, 240, 7, 10, 10};
 	PrintArray(array, SIZE);
 
-	//RadixSort_LSD(array, SIZE);
-	RadixSort_MSD(array, SIZE);
+	RadixSort_LSD(array, SIZE);
+	//RadixSort_MSD(array, SIZE);
 
 	PrintArray(array, SIZE);
 }
