@@ -78,12 +78,62 @@ namespace BUCKET
 		{}
 
 		~HashTable()
-		{}
+		{
+			Clear();
+		}
 
-		HashTable(const HashTable& ht);
-		HashTable& operator=(const HashTable& ht);
+		HashTable(const HashTable& ht)
+		{
+			_Copy(ht);
+		}
+
+		HashTable& operator=(const HashTable& ht)
+		{
+			if (this != &ht)
+			{
+				Clear();
+				_Copy(ht);
+			}
+
+			return *this;
+		}
 
 	public:
+		void _Copy(const HashTable& ht)
+		{
+			_tables.resize(ht._tables.size());
+
+			for (size_t i = 0; i < ht._tables.size(); ++i)
+			{
+				HashTableNode<K, V>* cur = ht._tables[i];
+				while (cur)
+				{
+					HashTableNode<K, V>* newCur = new HashTableNode<K, V>(cur->_key, cur->_value);
+
+					newCur->_next = _tables[i];
+					_tables[i] = newCur;
+
+					cur = cur->_next;
+				}
+			}
+		}
+
+		void Clear()
+		{
+			for (size_t i = 0; i < _tables.size(); ++i)
+			{
+				HashTableNode<K, V>* cur = _tables[i];
+				while (cur)
+				{
+					HashTableNode<K, V>* del = cur;
+					cur = cur->_next;
+					delete del;
+				}
+
+				_tables[i] = NULL;
+			}
+		}
+
 		//InsertUnique
 		//InsertEquel
 		bool Insert(const K& key, const V& value)
@@ -329,6 +379,9 @@ namespace BUCKET
 		ht1.Insert(99,99);
 
 		ht1.Print();
+
+		HashTable<int, double> ht2(ht1);
+		ht2.Print();
 	}
 
 	#include <time.h>

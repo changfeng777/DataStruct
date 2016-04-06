@@ -157,7 +157,7 @@ public:
 		}
 
 		// 若_day为负数，则开始校正日期
-		while (_day > DaysOfMonth(_year, _month))
+		while (_day >= DaysOfMonth(_year, _month))
 		{
 			_day -= DaysOfMonth (_year, _month);
 
@@ -283,6 +283,22 @@ ostream& operator<<(ostream& out, Date& d)
 
 	return out;
 }
+
+void Test1()
+{
+	Date d1(2015, 12, 15);
+	cout<<d1<<endl;
+
+	d1 += 15;
+	cout<<d1<<endl;
+
+	d1 -= 30;
+	cout<<d1<<endl;
+
+
+
+}
+
 
 void PromptInfo()
 {

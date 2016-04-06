@@ -61,7 +61,7 @@ namespace COW1
 			// Copy On Write
 			if (*_refCount > 1)
 			{
-				_Release();
+				--(*_refCount);
 
 				char* tmpPtr = new char[strlen(_str) + 1];
 				int* tmpCount = new int(1);
