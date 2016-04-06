@@ -397,7 +397,7 @@ void TestBinaryTree()
 	treeCopy2.PrevOrder();
 }
 
-// 二叉树三叉链结构--带
+// 二叉树三叉链结构
 template<class T>
 struct BinaryTreeNode_P
 {

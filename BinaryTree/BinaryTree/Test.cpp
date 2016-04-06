@@ -12,19 +12,22 @@ using namespace std;
 #include "HuffmanTree.hpp"
 #include "FileCompress.hpp"
 #include "BinarySearchTree.hpp"
+#include "AVLTree.hpp"
 
 int main()
 {
 	//TestBinaryTree();
 	//TestBinaryTree_P();
 	//TestBinaryTreeTopic();
-	TestBinaryTreeThd();
+	//TestBinaryTreeThd();
 	//TestHeap();
 	//TestRedPacket();
 
 	//TestHuffmanTree_A();
 	//TestCompress();
 	//TestBSTree();
+
+	TestAVLTree();
 
 	return 0;
 }

@@ -1,23 +1,23 @@
 #pragma once
 
 // Binary Search Tree Node
-template<class K, class D>
+template<class K, class V>
 struct BSTNode
 {
 	K _key;				// 节点关键值
-	D _data;			// 节点数据
+	V _value;			// 节点数据
 	BSTNode* _left;		// 左孩子
 	BSTNode* _right;	// 右孩子
 
-	BSTNode(const K& key, const D& data)
+	BSTNode(const K& key, const V& data)
 		:_key(key)
-		,_data(data)
+		,_value(data)
 		,_left(NULL)
 		,_right(NULL)
 	{}
 };
 
-template<class K, class D>
+template<class K, class V>
 class BSTree
 {
 public:
@@ -30,12 +30,12 @@ public:
 	BSTree&operator=(const BSTree& t);
 
 public:
-	BSTNode<K,D>* Find(const K& key)
+	BSTNode<K,V>* Find(const K& key)
 	{
 		return _Find(_root, key);
 	}
 
-	bool Insert(const K& key, const D& data)
+	bool Insert(const K& key, const V& data)
 	{
 		return _Insert(_root, key, data);
 	}
@@ -51,18 +51,18 @@ public:
 		cout<<endl;
 	}
 protected:
-	void _PrevOrder(BSTNode<K,D>* root)
+	void _PrevOrder(BSTNode<K,V>* root)
 	{
 		if (root)
 		{
 			_PrevOrder(root->_left);
-		//	cout<<"[key:"<<root->_key<<","<<root->_data<<"]"<<"->";
+		//	cout<<"[key:"<<root->_key<<","<<root->_value<<"]"<<"->";
 			cout<<root->_key<<", ";
 			_PrevOrder(root->_right);
 		}
 	}
 
-	BSTNode<K,D>* _Find(BSTNode<K,D>* root, const K& key)
+	BSTNode<K,V>* _Find(BSTNode<K,V>* root, const K& key)
 	{
 		if (root)
 		{
@@ -83,11 +83,11 @@ protected:
 		return NULL;
 	}
 
-	bool _Insert(BSTNode<K,D>*& root, const K& key, const D& data)
+	bool _Insert(BSTNode<K,V>*& root, const K& key, const V& data)
 	{
 		if (root == NULL)
 		{
-			root = new BSTNode<K,D>(key, data);
+			root = new BSTNode<K,V>(key, data);
 			return true;
 		}
 		else
@@ -107,7 +107,7 @@ protected:
 		}
 	}
 	
-	bool _Remove(BSTNode<K,D>*& root, const K& key)
+	bool _Remove(BSTNode<K,V>*& root, const K& key)
 	{
 		if (root)
 		{
@@ -125,26 +125,26 @@ protected:
 				// 2.如果左右均不为空，则使用右子树中序的第一个节点填补
 				if (root->_left == NULL)
 				{
-					BSTNode<K,D>* del = root;
+					BSTNode<K,V>* del = root;
 					root = root->_right;
 					delete del;
 				}
 				else if(root->_right == NULL)
 				{
-					BSTNode<K,D>* del = root;
+					BSTNode<K,V>* del = root;
 					root = root->_left;
 					delete del;
 				}
 				else
 				{
 					// 查找右子树的中序遍历的第一个节点
-					BSTNode<K,D>* right = root->_right;
+					BSTNode<K,V>* right = root->_right;
 					while (right->_left)
 					{
 						right = right->_left;
 					}
 
-					swap(root->_data, right->_data);
+					swap(root->_value, right->_value);
 					swap(root->_key, right->_key);
 					_Remove(root->_right, right->_key);
 				}
@@ -157,7 +157,7 @@ protected:
 	}
 
 private:
-	BSTNode<K,D>* _root;
+	BSTNode<K,V>* _root;
 };
 
 void TestBSTree()
