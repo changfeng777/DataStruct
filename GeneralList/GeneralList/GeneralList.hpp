@@ -84,6 +84,7 @@ public:
 		if (*str++ != '(')
 		{
 			cout<<"invalid str"<<endl;
+			return;
 		}
 
 		// 创建这一层的【头结点】
@@ -105,6 +106,7 @@ public:
 			}
 			else if(*str == ')')
 			{
+				//++str;
 				return;
 			}
 			else if(_IsValueChar(*str))
