@@ -13,6 +13,7 @@ using namespace std;
 #include "FileCompress.hpp"
 #include "BinarySearchTree.hpp"
 #include "AVLTree.hpp"
+#include "RBTree.hpp"
 
 int main()
 {
@@ -27,7 +28,9 @@ int main()
 	//TestCompress();
 	//TestBSTree();
 
-	TestAVLTree();
+	NonRecursion::TestAVLTree();
+	//Recursion::TestAVLTree();
+	//TestRBTree();
 
 	return 0;
 }
