@@ -231,7 +231,7 @@ public:
 		while(ReadLine(fOutConfig, line))
 		{
 			//
-			// 若读到一个空行，则对应字符为换行符
+			// 若读到一个空行(统计的字符为空行)，则对应字符为换行符
 			//
 			if (!line.empty())
 			{
@@ -269,45 +269,23 @@ public:
 		int pos = 8;
 		HuffmanNode_P<FileInfo>* cur = root;
 		ch = fgetc(fOut);
-		while(charCount > 0)
+		while(1)
 		{
-			while (cur && cur->_left && cur->_right)
-			{
-				if (pos == 0)
-				{
-					pos = 8;
-					ch = fgetc(fOut);
-				}
-
-				--pos;
-
-				if(ch & 1<<pos)
-				{
-					cur = cur->_right;
-#ifdef _DEBUG_
-					cout<<"1";
-#endif
-				}
-				else
-				{
-					cur = cur->_left;
-#ifdef _DEBUG_
-					cout<<"0";
-#endif
-				}
-			}
+			--pos;
+			if(ch & (1<<pos))
+				cur = cur->_right;
+			else
+				cur = cur->_left;
 			
-			if (cur && charCount--)
+			if (cur->_left == NULL && cur->_right == NULL)
 			{
-#ifdef _DEBUG_
-					cout<<"->";
-#endif
 				fputc(cur->_weight._ch, fIn);
 				cur = root;
+
+				if (charCount-- == 0)
+					break;
 			}
 		}
-
-		cout<<endl;
 
 		fclose(fIn);
 		fclose(fOut);

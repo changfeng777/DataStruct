@@ -20,6 +20,7 @@ struct BSTNode
 template<class K, class V>
 class BSTree
 {
+	typedef BSTNode<K, V> Node;
 public:
 	BSTree()
 		:_root(NULL)
@@ -30,17 +31,17 @@ public:
 	BSTree&operator=(const BSTree& t);
 
 public:
-	BSTNode<K,V>* Find(const K& key)
+	BSTNode<K,V>* Find_R(const K& key)
 	{
 		return _Find(_root, key);
 	}
 
-	bool Insert(const K& key, const V& data)
+	bool Insert_R(const K& key, const V& data)
 	{
 		return _Insert(_root, key, data);
 	}
 
-	bool Remove(const K& key)
+	bool Remove_R(const K& key)
 	{
 		return _Remove(_root, key);
 	}
@@ -50,6 +51,169 @@ public:
 		_PrevOrder(_root);
 		cout<<endl;
 	}
+
+	Node* Find(const K& key)
+	{
+		Node* cur = _root;
+		while(cur)
+		{
+			if (cur->_key > key)
+			{
+				cur = cur->_left;
+			}
+			else if (cur->_key < key)
+			{
+				cur = cur->_right;
+			}
+			else
+			{
+				return cur;
+			}
+		}
+
+		return NULL;
+	}
+
+	bool Remove(const K& key)
+	{
+		if (_root == NULL)
+		{
+			return false;
+		}
+		else if (_root->_left == NULL && _root->_right == NULL)
+		{
+			delete _root;
+			_root = NULL;
+			return true;
+		}
+
+		Node* parent = NULL;
+		Node* del = _root;
+		while (del)
+		{
+			if (del->_key > key)
+			{
+				parent = del;
+				del = del->_left;
+			}
+			else if (del->_key < key)
+			{
+				parent = del;
+				del = del->_right;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		if (del)
+		{
+			// 左树为空，则用右树调补
+			if (del->_left == NULL)
+			{
+				// 注意删除节点为根节点的情况
+				if (_root != del)
+				{
+					if(del == parent->_left)
+						parent->_left = del->_right;
+					else
+						parent->_right = del->_right;
+				}
+				else
+				{
+					_root = del->_right;
+				}
+				
+			}
+			else if (del->_right == NULL)
+			{
+				// 注意删除节点为根节点的情况
+				if (_root != del)
+				{
+					if(del == parent->_left)
+						parent->_left = del->_left;
+					else
+						parent->_right = del->_left;
+				}
+				else
+				{
+					_root = del->_right;
+				}
+			}
+			else
+			{
+				// 查找右子树的中序遍历的第一个节点
+				Node* subRight = del->_right; 
+				Node* firstInOrder = del->_right;
+				Node* parent = del;
+				while(firstInOrder->_left)
+				{
+					parent = firstInOrder;
+					firstInOrder = firstInOrder->_left;
+				}
+
+				swap(del->_key, firstInOrder->_key);
+				swap(del->_value, firstInOrder->_value);
+
+				if (firstInOrder == parent->_left)
+				{
+					parent->_left = firstInOrder->_right;
+				}
+				else
+				{
+					parent->_right = firstInOrder->_right;
+				}
+
+				del = firstInOrder;
+			}
+
+			delete del;
+		}
+		else
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	bool Insert(const K& key, const V& value)
+	{
+		if (_root == NULL)
+		{
+			_root = new Node(key, value);
+			return true;
+		}
+
+		Node* parent = NULL;
+		Node* cur = _root;
+		while (cur)
+		{
+			if (cur->_key < key)
+			{
+				parent = cur;
+				cur = cur->_right;
+			}
+			else if (cur->_key > key)
+			{
+				parent = cur;
+				cur = cur->_left;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		if (parent->_key < key)
+			parent->_right = new Node(key, value);
+		else
+			parent->_left = new Node(key, value);
+
+		return true;
+	}
+
 protected:
 	void _PrevOrder(BSTNode<K,V>* root)
 	{
