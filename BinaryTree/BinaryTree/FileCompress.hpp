@@ -112,11 +112,10 @@ public:
 		long long charCount = 0;
 		// 1.读取文件统计字符出现的次数。
 		FILE* fOut = fopen(fileName, "rb");
-		char ch = fgetc(fOut);
-		while (ch != EOF)
+		while (!feof(fOut))
 		{
+			char ch = fgetc(fOut);
 			_fileInfos[(unsigned char)ch]._appearCount++;
-			ch = fgetc(fOut);
 			++charCount;
 		}
 
@@ -137,11 +136,11 @@ public:
 
 		// 3.将压缩编码写入压缩文件中
 		fseek( fOut, 0, SEEK_SET);
-		ch = fgetc(fOut);
 		int pos = 0;
 		char value = 0;
-		while (ch != EOF)
+		while (!feof(fOut))
 		{
+			char ch = fgetc(fOut);
 			string& code = _fileInfos[(unsigned char)ch]._huffmanCode;
 #ifdef _DEBUG_
 			cout<<code<<"->";
@@ -162,8 +161,6 @@ public:
 					value = 0;
 				}
 			}
-
-			ch = fgetc(fOut);
 		}
 
 		if (pos)
@@ -301,14 +298,14 @@ void TestCompress()
 	FileCompress fc;
 	int begin = GetTickCount();
 
-	fc.Compress("Input");
+	fc.Compress("Input.Compress");
 
 	int end = GetTickCount();
 	cout<<"Compress:"<<end - begin<<endl;
 
 	begin = GetTickCount();
 
-	fc.Uncompress("Input");
+	fc.Uncompress("Input.Compress");
 
 	end = GetTickCount();
 	cout<<"Compress:"<<end - begin<<endl;
