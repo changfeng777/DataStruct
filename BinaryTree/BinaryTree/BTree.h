@@ -7,20 +7,20 @@
 template<class K, size_t M = 3>
 struct BTreeNode
 {
-	// 关键字--ps:_keys[M-1]位置不存实际的值，主要用于分裂时方便处理
-	K _keys[M];							
-	BTreeNode<K, M>* _subs[M];			// 孩子
+	// 关键字 -- ps:_keys[M-1]位置不存实际的值，主要用于分裂时方便处理
+	K _keys[M];	
+	// 孩子	  -- ps:第M+1位不用于实际中存储数据，只是在分裂前方便插入数据
+	BTreeNode<K, M>* _subs[M+1];		
 	size_t _size;						// 关键字个数
 
 	BTreeNode<K, M>* _parent;			// 父亲
-	bool _isLeaf;						// 是否是叶子节点
+	//bool _isLeaf;						// 是否是叶子节点
 
 	BTreeNode()
 		:_parent(NULL)
-		,_isLeaf(true)
 		,_size(0)
 	{
-		for (size_t i = 0; i < M; ++i)
+		for (size_t i = 0; i < M+1; ++i)
 		{
 			_subs[i] = NULL;
 		}
@@ -88,27 +88,32 @@ public:
 			if (cur->_size < M)
 				return true;
 
-			// 分裂
 			int boundary = M/2;
 			k = cur->_keys[boundary];
 
 			// 分裂出新节点
 			Node* tmp = new Node();
+			// 拷贝key
 			int index = 0;
 			for (int i = boundary+1; i < cur->_size; ++i)
 			{
-				tmp->_keys[index] = cur->_keys[i];
+				tmp->_keys[index++] = cur->_keys[i];
+				tmp->_size++;
+				cur->_keys[i] = K();
+			}
+			// 拷贝子节点，注意子节点要多一个
+			index = 0;
+			for (int i = boundary+1; i <= cur->_size; ++i)
+			{
 				tmp->_subs[index] = cur->_subs[i];
 				if (tmp->_subs[index])
 					tmp->_subs[index]->_parent = tmp;
-
-				++index;
-				tmp->_size++;
 				cur->_subs[i] = NULL;
+				++index;
 			}
-
 			cur->_size /= 2;
 
+			// 如果已经到根节点，则
 			if (cur->_parent == NULL)
 			{
 				_root = new Node;
@@ -130,14 +135,15 @@ public:
 
 	void _InsertKey(Node* cur, const K& key, Node* sub)
 	{
-		int i = cur->_size - 1;
+		int i = cur->_size-1;
 		while(i >= 0)
 		{
 			if (cur->_keys[i] > key)
 			{
 				cur->_keys[i+1] = cur->_keys[i];
-				cur->_subs[i+1] = cur->_subs[i];
-				++i;
+				// 子节点挪动后面的那一位
+				cur->_subs[i+2] = cur->_subs[i+1];
+				--i;
 			}
 			else
 			{
@@ -146,10 +152,31 @@ public:
 		}
 
 		cur->_keys[i+1] = key;
-		cur->_subs[i+1] = sub;
+		cur->_subs[i+2] = sub;
 		cur->_size++;
 		if (sub)
 			sub->_parent = cur;
+	}
+
+	void InOrder()
+	{
+		_InOrder(_root);
+	}
+
+	void _InOrder(Node* cur)
+	{
+		if (cur == NULL)
+		{
+			return;
+		}
+
+		for (size_t i = 0; i < cur->_size; ++i)
+		{
+			_InOrder(cur->_subs[i]);
+			cout<<cur->_keys[i]<<" ";
+		}
+
+		_InOrder(cur->_subs[cur->_size]);
 	}
 
 protected:
@@ -159,9 +186,11 @@ protected:
 void TestBTree()
 {
 	int a[] = {53, 75, 139, 49, 145, 36, 101};
-	BTree<int> t1;
+	BTree<int, 5> t1;
 	for (int i = 0; i < sizeof(a)/sizeof(int); ++i)
 	{
 		t1.Insert(a[i]);
 	}
+
+	t1.InOrder();
 }
