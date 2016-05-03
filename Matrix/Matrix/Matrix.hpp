@@ -7,20 +7,57 @@ template<class T>
 class SymmetricMatrix
 {
 public:
-	SymmetricMatrix(size_t n)
-		:_size(n*(n+1)/2)
+	SymmetricMatrix(T* a, size_t size)
+		:_a(new T[size*(size+1)/2])
+		,_size(size*(size+1)/2)
 	{
-		_matrixs = new T[_size];
+		assert(a);
+
+		size_t index = 0;
+		for (size_t i = 0; i < size; ++i)
+		{
+			for (size_t j = 0; j < size; ++j)
+			{
+				if (i >= j)
+				{
+					_a[index++] = a[i*size+j]; 
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
 	}
 
-	~SymmetricMatrix()
+	T& Access(size_t i, size_t j)
 	{
-		delete[] _matrixs;
+		if (i < j)
+		{
+			swap(i, j);
+		}
+
+		return _a[i*(i+1)/2+j];
 	}
-private:
-	T* _matrixs;
+
+protected:
+	T* _a;
 	size_t _size;
 };
+
+void TestSymmetricMatrix()
+{
+	int a[5][5]=
+	{
+		{0,1,2,3,4},
+		{1,0,1,2,3},
+		{2,1,0,1,2},
+		{3,2,1,0,1},
+		{4,3,2,1,0},
+	};
+
+	SymmetricMatrix<int> sm((int*)a, 5);
+}
 
 // ศýิชื้
 template<class T>
