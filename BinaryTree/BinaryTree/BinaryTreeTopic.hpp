@@ -20,6 +20,10 @@ Created Time: 2015-8-6
 //7. 求两个节点的最近公共祖先
 //8. 判断一棵二叉树是否是平衡二叉树
 //9. 求二叉树中最远的两个节点的距离
+//10. 由前序遍历和中序遍历重建二叉树（前序序列：1 2 3 4 5 6 - 中序序列:3 2 4 1 5 6）
+//11. 判断一棵树是否是完全二叉树
+//12. 求二叉树的镜像【y】
+//13. 将二叉搜索树转换为双向链表
 
 
 #pragma once
@@ -37,37 +41,40 @@ typedef int DataType;
 
 int statistics = 0;
 
-struct BinaryTreeNode_C
+namespace Topic
 {
-	DataType _data;			// 结点数据
-	BinaryTreeNode_C* _left;	// 左子树
-	BinaryTreeNode_C* _right;	// 右子树
+
+struct BinaryTreeNode
+{
+	DataType _data;				// 结点数据
+	BinaryTreeNode* _left;	// 左子树
+	BinaryTreeNode* _right;	// 右子树
 
 	// 在查找最远距离使用(侵入式编程)
 	int _maxLeftLen;
 	int _maxRightLen;
 
-	BinaryTreeNode_C(int data)
+	BinaryTreeNode(int data)
 		:_data(data)
 		,_left(0)
 		,_right(0)
 	{}
 };
 
-void CreateBinaryTree(BinaryTreeNode_C*& root, const vector<DataType>& vDatas, int& i)
+void CreateBinaryTree(BinaryTreeNode*& root, const vector<DataType>& vDatas, int& i)
 {
 	// 前序遍历创建二叉树
 	if(i < vDatas.size() && vDatas[i] !=  '#')
 	{
-		root = new BinaryTreeNode_C(vDatas[i]);
+		root = new BinaryTreeNode(vDatas[i]);
 		CreateBinaryTree(root->_left, vDatas, ++i);
 		CreateBinaryTree(root->_right, vDatas, ++i);
 	}
 }
 
-BinaryTreeNode_C* Find(BinaryTreeNode_C* root, DataType x)
+BinaryTreeNode* Find(BinaryTreeNode* root, DataType x)
 {
-	BinaryTreeNode_C* ret;
+	BinaryTreeNode* ret;
 	if (root == NULL)
 	{
 		return NULL;
@@ -92,7 +99,7 @@ BinaryTreeNode_C* Find(BinaryTreeNode_C* root, DataType x)
 }
 
 // 前序/中序/后序遍历
-void PrevOrder(BinaryTreeNode_C* root)
+void PrevOrder(BinaryTreeNode* root)
 {
 	if (root)
 	{
@@ -102,7 +109,7 @@ void PrevOrder(BinaryTreeNode_C* root)
 	}
 }
 
-void InOrder(BinaryTreeNode_C* root)
+void InOrder(BinaryTreeNode* root)
 {
 	if (root)
 	{
@@ -112,7 +119,7 @@ void InOrder(BinaryTreeNode_C* root)
 	}
 }
 
-void PostOrder(BinaryTreeNode_C* root)
+void PostOrder(BinaryTreeNode* root)
 {
 	if (root)
 	{
@@ -124,9 +131,9 @@ void PostOrder(BinaryTreeNode_C* root)
 }
 
 // 层次遍历打印二叉树
-void LevelOrder(BinaryTreeNode_C* root)
+void LevelOrder(BinaryTreeNode* root)
 {
-	queue<BinaryTreeNode_C*> q;
+	queue<BinaryTreeNode*> q;
 	if (root)
 	{
 		q.push(root);
@@ -134,7 +141,7 @@ void LevelOrder(BinaryTreeNode_C* root)
 
 	while (!q.empty())
 	{
-		BinaryTreeNode_C* node = q.front();
+		BinaryTreeNode* node = q.front();
 		cout<<node->_data<<" ";
 
 		if (node->_left)
@@ -151,7 +158,7 @@ void LevelOrder(BinaryTreeNode_C* root)
 }
 
 // 求高度
-int GetHeight(BinaryTreeNode_C* root)
+int GetHeight(BinaryTreeNode* root)
 {
 	statistics++;
 
@@ -169,7 +176,7 @@ int GetHeight(BinaryTreeNode_C* root)
 }
 
 // 叶子节点个数
-int GetLeafNum(BinaryTreeNode_C* root)
+int GetLeafNum(BinaryTreeNode* root)
 {
 	if(root == NULL)
 		return 0;
@@ -184,7 +191,7 @@ int GetLeafNum(BinaryTreeNode_C* root)
 }
 
 // 求第K层的节点个数
-int GetKLevelNum (BinaryTreeNode_C* root, int k)
+int GetKLevelNum (BinaryTreeNode* root, int k)
 {
 	if (root == NULL || k < 1)
 	{
@@ -200,7 +207,7 @@ int GetKLevelNum (BinaryTreeNode_C* root, int k)
 }
 
 // 判断一个节点是否在一棵树中
-bool IsInTree(BinaryTreeNode_C* root, BinaryTreeNode_C* node)
+bool IsInTree(BinaryTreeNode* root, BinaryTreeNode* node)
 {
 	if (root == NULL)
 	{
@@ -226,8 +233,8 @@ bool IsInTree(BinaryTreeNode_C* root, BinaryTreeNode_C* node)
 // 2.如果一个节点在左子树，另一个节点在右子树，则当前根节点即为祖先节点。
 // 3.如果两个均在左子树或右子树，则转化为子问题，在子树使用递归求解。
 //
-BinaryTreeNode_C* GetCommontAncestor(BinaryTreeNode_C* root,
-								   BinaryTreeNode_C* x1, BinaryTreeNode_C* x2)
+BinaryTreeNode* GetCommontAncestor(BinaryTreeNode* root,
+								   BinaryTreeNode* x1, BinaryTreeNode* x2)
 {
 	// 1.如果一个节点为根结点，另一个节点在一个子树中，则根节点为祖先节点。
 	if(root == x1 && IsInTree(root, x2))
@@ -270,9 +277,9 @@ BinaryTreeNode_C* GetCommontAncestor(BinaryTreeNode_C* root,
 }
 
 // 优化
-bool GetNodePath(BinaryTreeNode_C* root, 
-				 stack<BinaryTreeNode_C*>& s,
-				 BinaryTreeNode_C* x)
+bool GetNodePath(BinaryTreeNode* root, 
+				 stack<BinaryTreeNode*>& s,
+				 BinaryTreeNode* x)
 {
 	if (root)
 	{
@@ -304,12 +311,12 @@ bool GetNodePath(BinaryTreeNode_C* root,
 }
 
 // 优化
-BinaryTreeNode_C* GetCommontAncestor_OP(BinaryTreeNode_C* root,
-									  BinaryTreeNode_C* x1, BinaryTreeNode_C* x2)
+BinaryTreeNode* GetCommontAncestor_OP(BinaryTreeNode* root,
+									  BinaryTreeNode* x1, BinaryTreeNode* x2)
 {
 	// 获取两个节点的查找路径
-	stack<BinaryTreeNode_C*> s1;
-	stack<BinaryTreeNode_C*> s2;
+	stack<BinaryTreeNode*> s1;
+	stack<BinaryTreeNode*> s2;
 	GetNodePath(root, s1, x1);
 	GetNodePath(root, s2, x2);
 
@@ -329,7 +336,7 @@ BinaryTreeNode_C* GetCommontAncestor_OP(BinaryTreeNode_C* root,
 }
 
 // 判断一棵二叉树是否是平衡树（平衡树按AVL的标准）
-bool IsBalance(BinaryTreeNode_C* root)
+bool IsBalance(BinaryTreeNode* root)
 {
 	statistics++;
 
@@ -353,7 +360,7 @@ bool IsBalance(BinaryTreeNode_C* root)
 }
 
 // 优化
-bool IsBalance_OP(BinaryTreeNode_C* root, int& height)
+bool IsBalance_OP(BinaryTreeNode* root, int& height)
 {
 	statistics++;
 
@@ -396,7 +403,7 @@ bool IsBalance_OP(BinaryTreeNode_C* root, int& height)
 // http://www.cnblogs.com/miloyip/archive/2010/02/25/binary_tree_distance.html
 //
 int maxLen = 0;
-void FindMaxLen(BinaryTreeNode_C* root)
+void FindMaxLen(BinaryTreeNode* root)
 {
 	// 1.根节点为空则直接返回
 	if(root == NULL)
@@ -455,7 +462,7 @@ void FindMaxLen(BinaryTreeNode_C* root)
 // 3.逻辑判断复杂
 
 // 优化
-void FindMaxLen_OP1(BinaryTreeNode_C* root, int& maxLen)
+void FindMaxLen_OP1(BinaryTreeNode* root, int& maxLen)
 {
 	if (root == NULL)
 	{
@@ -476,7 +483,7 @@ void FindMaxLen_OP1(BinaryTreeNode_C* root, int& maxLen)
 }
 
 // 再优化
-int FindMaxLen_OP2(BinaryTreeNode_C* root, int& maxLen)
+int FindMaxLen_OP2(BinaryTreeNode* root, int& maxLen)
 {
 	if (root == NULL)
 	{
@@ -495,12 +502,254 @@ int FindMaxLen_OP2(BinaryTreeNode_C* root, int& maxLen)
 	return l > r ? l : r;
 }
 
+//10. 由前序遍历和中序遍历重建二叉树（前序序列：1 2 3 4 5 6 - 中序序列:3 2 4 1 6 5)
+BinaryTreeNode* _RebulidTree(int prevOrder[], int& index, int inSize,
+							 int inOrder[], int po1, int po2)
+{
+	BinaryTreeNode* root = NULL;
+	if (index < inSize && po1 <= po2)
+	{
+		// 前序确定根
+		root = new BinaryTreeNode(prevOrder[index]);
+
+		// 确定左右子树的区间
+		if (po1 < po2)
+		{
+			int div = po1;
+			while (inOrder[div] != prevOrder[index])
+			{
+				++div;
+			}
+			root->_left = _RebulidTree(prevOrder, ++index, inSize, inOrder, po1, div-1);
+			root->_right = _RebulidTree(prevOrder, ++index, inSize, inOrder,div+1, po2);
+		}
+	}
+
+	return root;
+}
+
+// 由前序遍历和中序遍历重建二叉树（前序序列：1 2 3 4 5 6 - 中序序列:3 2 4 1 6 5）
+BinaryTreeNode* RebulidTree(int inOrder[], int inSize,
+							 int prevOrder[], int prevSize)
+{
+	assert(inOrder);
+	assert(prevOrder);
+	assert(inSize == prevSize);
+
+	int index = 0;
+	return _RebulidTree(prevOrder, index, inSize, inOrder, 0, prevSize-1);
+}
+
+void TestRebulidTree()
+{
+	int prevOrder[] = {1,2,3,4,5,6};
+	int inOrder[] = {3,2,4,1,6,5};
+
+	BinaryTreeNode* root = RebulidTree(inOrder, sizeof(inOrder)/sizeof(int),
+		prevOrder, sizeof(prevOrder)/sizeof(int));
+
+	PrevOrder(root);
+	InOrder(root);
+}
+
+//11. 判断一棵树是否是完全二叉树
+bool IsCompleteTree(BinaryTreeNode* root)
+{
+	queue<BinaryTreeNode*> q;
+	if (root)
+		q.push(root);
+
+	bool isLast = false;
+
+	while (!q.empty())
+	{
+		BinaryTreeNode* front = q.front();
+		q.pop();
+		if (front->_left)
+		{
+			if (isLast)
+				return false;
+
+			q.push(front->_left);
+		}
+		else
+		{
+			isLast = true;
+		}
+
+		if (front->_right)
+		{
+			if (isLast)
+				return false;
+
+			q.push(front->_right);
+		}
+		else
+		{
+			isLast = true;
+		}
+	}
+
+	return true;
+}
+
+void TestIsCompleteTree()
+{
+	BinaryTreeNode* root = 0;
+
+	//	    1
+	//    /   \
+	//	 2	   5	
+	//  / \	  /
+	// 3   4  6
+	//
+
+	// 123##4##56
+	vector<DataType> t;
+	t.push_back(1);
+	t.push_back(2);
+	t.push_back(3);
+	t.push_back('#');
+	t.push_back('#');
+	t.push_back(4);
+	t.push_back('#');
+	t.push_back('#');
+	t.push_back(5);
+	t.push_back(6);
+
+	int index = 0;
+	CreateBinaryTree(root, t, index);
+
+	cout<<"IsCompleteTree?"<<IsCompleteTree(root)<<endl;
+
+}
+
+//12. 求二叉树的镜像【y】
+void ToTreeMirror(BinaryTreeNode* root)
+{
+	if (root == NULL)
+	{
+		return;
+	}
+
+	swap(root->_left, root->_right);
+	ToTreeMirror(root->_left);
+	ToTreeMirror(root->_right);
+}
+
+void TestToTreeMirror()
+{
+	BinaryTreeNode* root = 0;
+
+	//	    1
+	//    /   \
+	//	 2	   5	
+	//  / \	  /	\
+	// 3   4  6  7
+	//
+
+	// 123##4##56##7
+	vector<DataType> t;
+	t.push_back(1);
+	t.push_back(2);
+	t.push_back(3);
+	t.push_back('#');
+	t.push_back('#');
+	t.push_back(4);
+	t.push_back('#');
+	t.push_back('#');
+	t.push_back(5);
+	t.push_back(6);
+	t.push_back('#');
+	t.push_back('#');
+	t.push_back(7);
+
+	int index = 0;
+	CreateBinaryTree(root, t, index);
+	ToTreeMirror(root);
+
+	PrevOrder(root);
+	cout<<endl;
+}
+
+//13.将二叉搜索树转换成一个排序的双向链表。要求不能创建任何新的结点，只能调整树中结点指针的指向
+// left表示双向链表的前驱指针，right代表双向链表的后继指针
+void _ToList(BinaryTreeNode* cur, BinaryTreeNode*& prev)
+{
+	if (cur == NULL)
+		return;
+	
+	_ToList(cur->_left, prev);
+
+	cur->_left = prev;
+	if (prev)
+		prev->_right = cur;
+
+	prev = cur;
+
+	_ToList(cur->_right, prev);
+}
+
+BinaryTreeNode* ToList(BinaryTreeNode* root)
+{
+	// 先找到最左节点作为链表的头
+	BinaryTreeNode* head = root;
+	while (head && head->_left)
+	{
+		head = head->_left;
+	}
+
+	BinaryTreeNode* prev = NULL;
+	_ToList(root, prev);
+
+	return head;
+}
+
+void TestToList()
+{
+	// 531##4##76
+	vector<DataType> t;
+	t.push_back(5);
+	t.push_back(3);
+	t.push_back(1);
+	t.push_back('#');
+	t.push_back('#');
+	t.push_back(4);
+	t.push_back('#');
+	t.push_back('#');
+	t.push_back(7);
+	t.push_back(6);
+
+	int index = 0;
+	BinaryTreeNode* root = 0;
+	CreateBinaryTree(root, t, index);
+
+	BinaryTreeNode* head = ToList(root);
+
+
+	BinaryTreeNode* tail = NULL;
+	while (head)
+	{
+		cout<<head->_data<<" ";
+		tail = head;
+		head = head->_right;
+	}
+	cout<<endl;
+
+	while (tail)
+	{
+		cout<<tail->_data<<" ";
+		tail = tail->_left;
+	}
+	cout<<endl;
+}
+
 // 测试二叉树编程题
 void TestBinaryTreeTopic()
 {
 	cout<<endl;
 	cout<<"TestBinaryTreeTopic:"<<endl;
-	BinaryTreeNode_C* root = 0;
+	BinaryTreeNode* root = 0;
 
 	//	    1
 	//    /   \
@@ -550,11 +799,11 @@ void TestBinaryTreeTopic()
 	cout<<"Height:"<<GetHeight(root)<<endl;
 	cout<<"Leaf Number:"<<GetLeafNum(root)<<endl;
 
-	BinaryTreeNode_C* ret = Find(root, 3);
+	BinaryTreeNode* ret = Find(root, 3);
 	cout<<"Is 3 In The Tree:"<<IsInTree(root, ret)<<endl;
 
-	BinaryTreeNode_C* x1 = Find(root, 4);
-	BinaryTreeNode_C* x2 = Find(root, 5);
+	BinaryTreeNode* x1 = Find(root, 4);
+	BinaryTreeNode* x2 = Find(root, 5);
 	ret = GetCommontAncestor_OP(root, x1, x2);
 	if (ret)
 	{
@@ -586,4 +835,23 @@ void TestBinaryTreeTopic()
 	maxLen = 0;
 	FindMaxLen_OP2(root, maxLen);
 	cout<<"OP2 Max Len:"<<maxLen<<endl;
+
+	// 测试二叉树重建
+	cout<<"TestRebulidTree:";
+	TestRebulidTree();
+	cout<<endl;
+
+	// 测试搜索二叉树转换成双向链表
+	cout<<"TestToList:";
+	TestToList();
+
+	// 测试求二叉树的镜像
+	cout<<"TestToTreeMirror:";
+	TestToTreeMirror();
+
+	// 测试判断是否是完全二叉树
+	cout<<"TestIsCompleteTree:";
+	TestIsCompleteTree();
 };
+
+}
