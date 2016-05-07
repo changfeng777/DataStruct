@@ -8,12 +8,21 @@ using namespace std;
 class BitSet
 {
 public:
+	BitSet()
+	{}
+
 	BitSet(size_t size)
 	{
 		// 计算需要多个int来存储这些数据。
 		// 右移5 == /32
-		_datas.reserve((size>>5) + 1);
-		_datas.assign((size>>5) + 1, 0);
+		//_datas.reserve((size>>5) + 1);
+		//_datas.assign((size>>5) + 1, 0);
+		_datas.resize((size>>5)+1);
+	}
+
+	void Resize(size_t size)
+	{
+		_datas.resize((size>>5)+1);
 	}
 
 	size_t _Converse(size_t size)
