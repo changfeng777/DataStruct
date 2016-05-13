@@ -95,13 +95,16 @@ public:
 		assert(fOut);
 
 		char ch = fgetc(fOut);
-		if (ch == EOF)
+		if (feof(fOut))
 			return false;
 
-		while (ch != '\n' && ch != EOF)
+		while (ch != '\n')
 		{
 			line += ch;
 			ch = fgetc(fOut);
+
+			if (feof(fOut))
+				break;
 		}
 
 		return true;
@@ -112,9 +115,13 @@ public:
 		long long charCount = 0;
 		// 1.读取文件统计字符出现的次数。
 		FILE* fOut = fopen(fileName, "rb");
-		while (!feof(fOut))
+		while (1)
 		{
+			// 解决feof到文件尾以后会多读一个文件尾的标记字符-1
 			char ch = fgetc(fOut);
+			if (feof(fOut))
+				break;
+
 			_fileInfos[(unsigned char)ch]._appearCount++;
 			++charCount;
 		}
@@ -138,9 +145,12 @@ public:
 		fseek( fOut, 0, SEEK_SET);
 		int pos = 0;
 		char value = 0;
-		while (!feof(fOut))
+		while (1)
 		{
 			char ch = fgetc(fOut);
+			if (feof(fOut))
+				break;
+
 			string& code = _fileInfos[(unsigned char)ch]._huffmanCode;
 #ifdef _DEBUG_
 			cout<<code<<"->";
@@ -269,6 +279,7 @@ public:
 		while(1)
 		{
 			--pos;
+
 			if(ch & (1<<pos))
 				cur = cur->_right;
 			else
@@ -279,8 +290,18 @@ public:
 				fputc(cur->_weight._ch, fIn);
 				cur = root;
 
-				if (charCount-- == 0)
+				//
+				// 此处使用个数来判断解压缩是否完成，因为压缩时，最后一个字符
+				// 可能存在补位，继续解压缩，会误解一些字符。
+				//
+				if (--charCount == 0)
 					break;
+			}
+
+			if (pos == 0)
+			{
+				ch = fgetc(fOut);
+				pos = 8;
 			}
 		}
 
@@ -298,14 +319,14 @@ void TestCompress()
 	FileCompress fc;
 	int begin = GetTickCount();
 
-	fc.Compress("Input.Compress");
+	fc.Compress("Input");
 
 	int end = GetTickCount();
 	cout<<"Compress:"<<end - begin<<endl;
 
 	begin = GetTickCount();
 
-	fc.Uncompress("Input.Compress");
+	fc.Uncompress("Input");
 
 	end = GetTickCount();
 	cout<<"Compress:"<<end - begin<<endl;

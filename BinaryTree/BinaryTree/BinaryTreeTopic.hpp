@@ -503,11 +503,11 @@ int FindMaxLen_OP2(BinaryTreeNode* root, int& maxLen)
 }
 
 //10. 由前序遍历和中序遍历重建二叉树（前序序列：1 2 3 4 5 6 - 中序序列:3 2 4 1 6 5)
-BinaryTreeNode* _RebulidTree(int prevOrder[], int& index, int inSize,
+BinaryTreeNode* _RebulidTree(int prevOrder[], int& index, int prevSize,
 							 int inOrder[], int po1, int po2)
 {
 	BinaryTreeNode* root = NULL;
-	if (index < inSize && po1 <= po2)
+	if (index < prevSize && po1 <= po2)
 	{
 		// 前序确定根
 		root = new BinaryTreeNode(prevOrder[index]);
@@ -520,8 +520,8 @@ BinaryTreeNode* _RebulidTree(int prevOrder[], int& index, int inSize,
 			{
 				++div;
 			}
-			root->_left = _RebulidTree(prevOrder, ++index, inSize, inOrder, po1, div-1);
-			root->_right = _RebulidTree(prevOrder, ++index, inSize, inOrder,div+1, po2);
+			root->_left = _RebulidTree(prevOrder, ++index, prevSize, inOrder, po1, div-1);
+			root->_right = _RebulidTree(prevOrder, ++index, prevSize, inOrder,div+1, po2);
 		}
 	}
 
@@ -537,7 +537,7 @@ BinaryTreeNode* RebulidTree(int inOrder[], int inSize,
 	assert(inSize == prevSize);
 
 	int index = 0;
-	return _RebulidTree(prevOrder, index, inSize, inOrder, 0, prevSize-1);
+	return _RebulidTree(prevOrder, index, prevSize, inOrder, 0, prevSize-1);
 }
 
 void TestRebulidTree()
