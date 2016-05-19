@@ -244,12 +244,13 @@ public:
 		return _linkTable[src]._head;
 	}
 
-	LinkEdge<V,W>* _GetNextEdge(int src, int next)
+	// 获取临接表里的下一条边
+	LinkEdge<V,W>* _GetNextEdge(int src, int cur)
 	{
 		LinkEdge<V,W>* edge = _linkTable[src]._head;
 		while (edge)
 		{
-			if (edge->_dstIndex == next)
+			if (edge->_dstIndex == cur)
 			{
 				return edge->_next;
 			}
@@ -294,7 +295,8 @@ public:
 			}
 
 			// 4.查找当前顶点的下一个顶点
-			edge = _GetNextEdge(src, edge->_dstIndex);
+			//edge = _GetNextEdge(src, edge->_dstIndex);
+			edge = edge->_next;
 		}
 	}
 
@@ -336,7 +338,8 @@ public:
 					q.push(edge->_dstIndex);
 				}
 
-				edge = _GetNextEdge(cur, edge->_dstIndex);
+				//edge = _GetNextEdge(cur, edge->_dstIndex);
+				edge = edge->_next;
 			}
 		}
 	}
@@ -450,6 +453,9 @@ public:
 
 	W _GetWeight(int src, int dst, const W& maxValue)
 	{
+		if (src == dst)
+			return maxValue;
+
 		LinkEdge<V,W>* edge = _linkTable[src]._head;
 		while (edge)
 		{
@@ -466,7 +472,6 @@ public:
 
 	// 非负单源最短路径--Dijkstra(迪科斯彻)
 	// 求src到其他顶点的最短路径
-
 	void _Dijkstra(int src, W* dist, int* path, bool* vSet, int size, const W& maxValue)
 	{
 		//
@@ -504,8 +509,12 @@ public:
 			vSet[minIndex] = true;
 			for (int k = 0; k < size; ++k)
 			{
-				// 
-				// 如果dist(src->min)+dist(min, k)的权值小于dist(src, k)
+				if(k == src)
+					continue;
+
+				//  
+				// 更新src->k的距离
+				// 如果dist(src,min)+dist(min, k)的权值小于dist(src, k)
 				// 则更新dist(src,k)和path(src->min->k)
 				//
 				W w = _GetWeight(minIndex, k, maxValue);
@@ -681,4 +690,5 @@ void Test4()
 	g.Display();
 
 	g.Dijkstra(0, 10000);
+	//g.Dijkstra(1, 10000);
 }
