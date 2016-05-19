@@ -1,13 +1,16 @@
 /******************************************************************************************
 Copyright (c) Bit Software, Inc.(2013), All rights reserved.
 
-Purpose: 栈的使用单链表的适配器模式实现    
+Purpose: 使用栈解决迷宫问题
 
 Author: 迷宫实现
 
 Created Time: 2015-8-1
 ******************************************************************************************/
 #pragma once
+#include <stack>
+
+// ps:作业扩展使用递归实现迷宫，并比较非递归实现
 
 struct Pos
 {
@@ -81,68 +84,66 @@ bool CheckIsAccess(int** ppMaze, int n, Pos pos)
 	return false;
 }
 
-bool Maze(int** ppMaze, int n, const Pos& entry, Stack<Pos>& path)
+bool Maze(int** ppMaze, int n, const Pos& entry, stack<Pos>& path)
 {
 	assert(entry.col < n && entry.row < n);
 	
 	Pos cur = entry;
 	ppMaze[cur.row][cur.col] = 2;
-	path.Push(cur);
+	path.push(cur);
 
-	while (!path.Empty())
+	while (!path.empty())
 	{
-		 Pos next = path.Top();
+		 Pos next = path.top();
 		
 		 //
 		 // 出口在最后一行
 		 //
 		 if (next.row == n-1)
-		 {
 			 return true;
-		 }
 
 		 // 上
 		 next.row -= 1;
 		 if (CheckIsAccess(ppMaze, n, next))
 		 {
 			ppMaze[next.row][next.col] = 2;
-			path.Push(next);
+			path.push(next);
 			continue;
 		 }
 
 		 // 右
-		 next = path.Top();
+		 next = path.top();
 		 next.col += 1;
 		 if (CheckIsAccess(ppMaze, n, next))
 		 {
 			 ppMaze[next.row][next.col] = 2;
-			 path.Push(next);
+			 path.push(next);
 			 continue;
 		 }
 
 		 // 下
-		 next = path.Top();
+		 next = path.top();
 		 next.row += 1;
 		 if (CheckIsAccess(ppMaze, n, next))
 		 {
 			 ppMaze[next.row][next.col] = 2;
-			 path.Push(next);
+			 path.push(next);
 			 continue;
 		 }
 
 		 // 左
-		 next = path.Top();
+		 next = path.top();
 		 next.col -= 1;
 		 if (CheckIsAccess(ppMaze, n, next))
 		 {
 			 ppMaze[next.row][next.col] = 2;
-			 path.Push(next);
+			 path.push(next);
 			 continue;
 		 }
 
-		 Pos tmp = path.Top();
+		 Pos tmp = path.top();
 		 ppMaze[tmp.row][tmp.col] = 3;
-		 path.Pop();
+		 path.pop();
 	}
 
 	return false;
@@ -155,16 +156,16 @@ void TestMaze()
 	Pos entry = InitMaze(ppMaze, n);
 	PrintMaze(ppMaze, n);
 
-	Stack<Pos> path;
+	stack<Pos> path;
 	Maze(ppMaze, n, entry, path);
 	PrintMaze(ppMaze, n);
 
 	cout<<"Path:";
-	while (!path.Empty())
+	while (!path.empty())
 	{
-		const Pos& pos = path.Top();
+		const Pos& pos = path.top();
 		cout<<"("<<pos.row<<"，"<<pos.col<<")"<<"<-";
-		path.Pop();
+		path.pop();
 	}
 
 	cout<<"Entry"<<endl;

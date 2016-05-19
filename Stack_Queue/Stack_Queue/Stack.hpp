@@ -32,6 +32,8 @@ public:
 		}
 	}
 
+	// 拷贝构造和赋值运算符的重载需要实现，并考虑深拷贝浅拷贝问题。(作业完成)
+
 public:
 	void Push(const T& x)
 	{
@@ -63,7 +65,7 @@ public:
 
 	void Print()
 	{
-		for (int i = 0; i < _size; ++i)
+		for (size_t i = 0; i < _size; ++i)
 		{
 			cout<<_data[i]<<"->";
 		}
@@ -74,12 +76,16 @@ private:
 	{
 		if (_capacity == _size)
 		{
-			T* tmp = new T[2*_capacity];
+			T* tmp = new T[_capacity];
 			//
 			// 如果T是自定类型的考虑深浅拷贝的问题
 			// 当T是string等类型时得用operator=
 			//
-			memcpy(tmp, _data, _size*sizeof(T));
+			//memcpy(tmp, _data, _size*sizeof(T));
+			for(size_t i = 0; i < _size; ++i)
+			{
+				tmp[i] = _data[i]; 
+			}
 			_capacity *= 2;
 
 			delete[] _data;
