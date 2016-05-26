@@ -6,14 +6,14 @@
 // 动态结构
 
 template<class T>
-struct HuffmanNode_P
+struct HuffmanNode
 {
 	T _weight;				// 权重				
-	HuffmanNode_P* _parent;	// 父节点
-	HuffmanNode_P* _left;	// 左孩子节点
-	HuffmanNode_P* _right;	// 右孩子节点
+	HuffmanNode* _parent;	// 父节点
+	HuffmanNode* _left;	// 左孩子节点
+	HuffmanNode* _right;	// 右孩子节点
 
-	HuffmanNode_P(const T& weight)
+	HuffmanNode(const T& weight)
 		:_parent(NULL)
 		,_left(NULL)
 		,_right(NULL)
@@ -34,7 +34,7 @@ public:
 		Destory(_root);
 	}
 
-	void Destory(HuffmanNode_P<T>*& root)
+	void Destory(HuffmanNode<T>*& root)
 	{
 		if (root)
 		{
@@ -46,7 +46,7 @@ public:
 		}
 	}
 
-	HuffmanNode_P<T>* GetRootNode()
+	HuffmanNode<T>* GetRootNode()
 	{
 		return _root;
 	}
@@ -56,19 +56,19 @@ public:
 	{	
 		struct Compare 
 		{
-			bool operator()(HuffmanNode_P<T>*& lhs, HuffmanNode_P<T>*& rhs)
+			bool operator()(HuffmanNode<T>*& lhs, HuffmanNode<T>*& rhs)
 			{
 				return lhs->_weight < rhs->_weight;
 			}
 		};
 
 		// 1.将所有值构建为节点放入到一个最小堆中，Compare仿函数做比较器
-		Heap<HuffmanNode_P<T>*, Compare> minHeap;
+		Heap<HuffmanNode<T>*, Compare> minHeap;
 		for (int i = 0; i < size; ++i)
 		{
 			if (array[i] != invalid)
 			{
-				HuffmanNode_P<T>* node = new HuffmanNode_P<T>(array[i]);
+				HuffmanNode<T>* node = new HuffmanNode<T>(array[i]);
 				minHeap.Push(node);
 			}
 		}
@@ -77,15 +77,15 @@ public:
 			return;
 
 		// 2.获取出最小和次小的节点做孩子节点，并构建这两个孩子节点的父节点进行链接。
-		HuffmanNode_P<T>* parent = minHeap.GetTop();
+		HuffmanNode<T>* parent = minHeap.Top();
 		while (minHeap.Size() > 1)
 		{
-			HuffmanNode_P<T>* first = minHeap.GetTop();
+			HuffmanNode<T>* first = minHeap.Top();
 			minHeap.Pop();
-			HuffmanNode_P<T>* second = minHeap.GetTop();
+			HuffmanNode<T>* second = minHeap.Top();
 			minHeap.Pop();
 
-			parent = new HuffmanNode_P<T>(first->_weight + second->_weight);
+			parent = new HuffmanNode<T>(first->_weight + second->_weight);
 			parent->_left = first;
 			parent->_right = second;
 			first->_parent = parent;
@@ -100,7 +100,7 @@ public:
 	// 层次遍历打印二叉树
 	void LevelOrder()
 	{
-		queue<HuffmanNode_P<T>* > q;
+		queue<HuffmanNode<T>* > q;
 		if (_root)
 		{
 			q.push(_root);
@@ -108,7 +108,7 @@ public:
 
 		while (!q.empty())
 		{
-			HuffmanNode_P<T>* node = q.front();
+			HuffmanNode<T>* node = q.front();
 			cout<<node->_weight<<"	";
 
 			if (node->_left)
@@ -127,7 +127,7 @@ public:
 	}
 
 private:
-	HuffmanNode_P<T>* _root;
+	HuffmanNode<T>* _root;
 };
 
 void TestHuffmanTree_P()
@@ -189,9 +189,9 @@ public:
 
 		while (minHeap.Size() > 1)
 		{
-			HuffmanNode_A<T>* first = minHeap.GetTop();
+			HuffmanNode_A<T>* first = minHeap.Top();
 			minHeap.Pop();
-			HuffmanNode_A<T>* second = minHeap.GetTop();
+			HuffmanNode_A<T>* second = minHeap.Top();
 			minHeap.Pop();
 
 			_vNodes.push_back(HuffmanNode_A<T>(first->_weight + second->_weight));
@@ -205,7 +205,7 @@ public:
 			parent._right = second->_index;
 		}
 
-		_rootIndex = minHeap.GetTop()->_index;
+		_rootIndex = minHeap.Top()->_index;
 	}
 
 private:

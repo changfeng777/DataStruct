@@ -61,7 +61,7 @@ public:
 		}
 	}
 
-	const T& GetTop()
+	const T& Top()
 	{
 		return _vec[0];
 	}
@@ -149,7 +149,7 @@ void TestHeap()
 
 	while (!heap.Empty())
 	{
-		cout<<heap.GetTop()<<" ";
+		cout<<heap.Top()<<" ";
 		heap.Pop();
 	}
 	cout<<endl;
@@ -160,7 +160,7 @@ void TestHeap()
 
 	while (!heap1.Empty())
 	{
-		cout<<heap1.GetTop()<<" ";
+		cout<<heap1.Top()<<" ";
 		heap1.Pop();
 	}
 	cout<<endl;

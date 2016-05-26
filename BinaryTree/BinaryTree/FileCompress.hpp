@@ -54,7 +54,7 @@ public:
 		}
 	}
 
-	void _GenerateHuffmanCode(HuffmanNode_P<FileInfo>* root)
+	void _GenerateHuffmanCode(HuffmanNode<FileInfo>* root)
 	{
 		if (root)
 		{
@@ -67,8 +67,8 @@ public:
 				// code是_fileInfos数组中编码字符串对象的引用。
 				string& code = _fileInfos[root->_weight._ch]._huffmanCode;
 
-				HuffmanNode_P<FileInfo>* cur = root;
-				HuffmanNode_P<FileInfo>* parent = root->_parent;
+				HuffmanNode<FileInfo>* cur = root;
+				HuffmanNode<FileInfo>* parent = root->_parent;
 				while (parent)
 				{
 					if (parent->_left == cur)
@@ -261,7 +261,7 @@ public:
 #ifdef _DEBUG_
 		tree.LevelOrder();
 #endif
-		HuffmanNode_P<FileInfo>* root = tree.GetRootNode();
+		HuffmanNode<FileInfo>* root = tree.GetRootNode();
 
 		// 3. 读取压缩信息，根据重建的Huffman树解压缩
 		string uncompressFileName = fileName;
@@ -274,7 +274,7 @@ public:
 
 		// 4.根据压缩文件字符编码再Huffman树中寻找对应的字符
 		int pos = 8;
-		HuffmanNode_P<FileInfo>* cur = root;
+		HuffmanNode<FileInfo>* cur = root;
 		ch = fgetc(fOut);
 		while(1)
 		{
