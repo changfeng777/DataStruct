@@ -367,7 +367,7 @@ public:
 				// 无向图的边需要进行过滤
 				if (begin->_srcIndex < begin->_dstIndex)
 				{
-					minHeap.Insert(begin);
+					minHeap.Push(begin);
 				}
 
 				begin = begin->_next;
@@ -384,8 +384,8 @@ public:
 				return false;
 			}
 
-			LinkEdge<V,W>* edge = minHeap.GetHeapTop();
-			minHeap.Remove();
+			LinkEdge<V,W>* edge = minHeap.Top();
+			minHeap.Pop();
 			int src = UFSet.Find(edge->_srcIndex);
 			int dst = UFSet.Find(edge->_dstIndex);
 
@@ -425,7 +425,7 @@ public:
 			{
 				if (visitedSet[edge->_dstIndex] == false)
 				{
-					minHeap.Insert(edge);
+					minHeap.Push(edge);
 				}
 
 				edge = _GetNextEdge(src, edge->_dstIndex);
@@ -434,8 +434,8 @@ public:
 			// 2.选出堆中最小的边加入生成树
 			while(!minHeap.Empty() && count < _vertexSize)
 			{
-				edge = minHeap.GetHeapTop();
-				minHeap.Remove();
+				edge = minHeap.Top();
+				minHeap.Pop();
 				if (visitedSet[edge->_dstIndex] == false)
 				{
 					minSpanTree._AddEdge(edge->_srcIndex, edge->_dstIndex,edge->_weight);
@@ -555,7 +555,7 @@ public:
 		{
 			if (dist[i] < maxValue)
 			{
-				minHeap.Insert(make_pair(dist[i], i));
+				minHeap.Push(make_pair(dist[i], i));
 			}
 		}
 
@@ -572,8 +572,8 @@ public:
 			if (minHeap.Empty())
 				continue;
 
-			int minIndex = minHeap.GetHeapTop().second;
-			minHeap.Remove();
+			int minIndex = minHeap.Top().second;
+			minHeap.Pop();
 
 			vSet[minIndex] = true;
 			for (int k = 0; k < size; ++k)
@@ -588,7 +588,7 @@ public:
 					dist[k] = dist[minIndex] + w;
 					path[k] = minIndex;
 
-					minHeap.Insert(make_pair(dist[k], k));
+					minHeap.Push(make_pair(dist[k], k));
 				}
 			}
 		}

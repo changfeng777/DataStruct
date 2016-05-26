@@ -36,7 +36,7 @@ public:
 	}
 
 	// 插入一个数据x到最小堆中
-	void Insert(const T& x)
+	void Push(const T& x)
 	{
 		_vec.push_back(x);
 
@@ -47,7 +47,7 @@ public:
 	}
 
 	// 删除堆顶元素
-	void Remove()
+	void Pop()
 	{
 		int size = _vec.size();
 		assert(size > 0);
@@ -61,7 +61,7 @@ public:
 		}
 	}
 
-	const T& GetHeapTop()
+	const T& Top()
 	{
 		return _vec[0];
 	}
