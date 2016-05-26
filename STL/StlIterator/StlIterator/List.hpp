@@ -1,15 +1,12 @@
 #pragma once
 #include <assert.h>
 
+#include "StlIterator.hpp"
+
 template<class T>
 struct __ListNode
 {
-	__ListNode()
-		:_next(NULL)
-		,_prev(NULL)
-	{}
-
-	__ListNode(const T& x)
+	__ListNode(const T& x = T())
 		:_data(x)
 		,_next(NULL)
 		,_prev(NULL)
@@ -21,18 +18,23 @@ struct __ListNode
 };
 
 // List的迭代器
-template<class T>
+template<class T, class Ref, class Ptr>
 class __ListIterator
 {
 public:
-	typedef __ListIterator<T> Iterator;
+	typedef __ListIterator<T, T&, T*> Iterator;
+
+	// 这里Ref、Ptr模板参数主要是为了方便复用的方式实现const类型的迭代器ConstIterator
+	typedef __ListIterator<T, const T&, const T*> ConstIterator;
+	typedef __ListIterator<T, Ref, Ptr> Self;
+
 
 	// List是个双向链表，所以它的迭代器是一个双向迭代器类型
 	typedef BidirectionalIteratorTag IteratorCategory;
 	typedef T ValueType;
 	typedef ptrdiff_t  DifferenceType;
-	typedef T* Pointer;
-	typedef T& Reference;
+	typedef Ptr Pointer;
+	typedef Ref Reference;
 	typedef __ListNode<T>* LinkType;
 
 	// 指向节点的指针
@@ -42,11 +44,11 @@ public:
 		:_node(node)
 	{}
 
-	bool operator==(const __ListIterator<T>& x) const
+	bool operator==(const Self& x) const
 	{ 
 		return _node == x._node;
 	}
-	bool operator!=(const __ListIterator<T>& x) const
+	bool operator!=(const Self& x) const
 	{ 
 		return _node != x._node;
 	}
@@ -61,28 +63,28 @@ public:
 		return &(operator*());
 	}
 
-	__ListIterator<T>& operator++()
+	Self& operator++()
 	{ 
 		_node = _node->_next;
 		return *this;
 	}
 
-	__ListIterator<T> operator++(int)
+	Self operator++(int)
 	{
-		__ListIterator<T> tmp(_node);
+		Self tmp(_node);
 		_node = _node->_next;
 		return tmp;
 	}
 
-	__ListIterator<T>& operator--()
+	Self& operator--()
 	{ 
 		_node = _node->_prev;
 		return *this;
 	}
 
-	__ListIterator<T>& operator--(int)
+	Self& operator--(int)
 	{ 
-		__ListIterator<T> tmp(_node);
+		Self tmp(_node);
 		_node = _node->_prev;
 		return tmp;
 	}
@@ -95,15 +97,19 @@ template<class T>
 class List
 {
 public:
-	typedef __ListIterator<T> Iterator;
+	typedef __ListIterator<T, T&, T*> Iterator;
+	typedef __ListIterator<T, const T&, const T*> ConstIterator;
+
+	typedef ReverseIterator<Iterator> ReverseIterator;
 
 	typedef T ValueType;
 	typedef __ListNode<T>* LinkType; 
 
 	List()
+		:_head(new __ListNode<T>())
 	{
-		_head._prev = &_head;
-		_head._next = &_head;
+		_head->_prev = _head;
+		_head->_next = _head;
 	}
 
 	~List()
@@ -162,13 +168,27 @@ public:
 
 	Iterator Begin()
 	{
-		return _head._next;
+		return _head->_next;
 	}
 
 	Iterator End()
 	{
-		return &_head;
+		return _head;
 	}
+
+	ConstIterator Begin() const
+	{
+		return _head->_next;
+	}
+
+	ConstIterator End() const
+	{
+		return _head;
+	}
+
+	ReverseIterator RBegin() { return ReverseIterator(End()); }
+
+	ReverseIterator REnd() { return ReverseIterator(Begin()); }
 
 	void Clear()
 	{
@@ -185,11 +205,11 @@ private:
 	//
 	// 哨兵位的头结点，方便作为迭代器的end
 	//
-	__ListNode<T> _head;	
+	__ListNode<T>* _head;	
 };
 
-// 1.测试List迭代器
-void PrintList(List<int>& l1)
+// 1.测试List迭代器Iterator
+void PrintList1(List<int>& l1)
 {
 	List<int>::Iterator it = l1.Begin();
 	for (; it != l1.End(); ++it)
@@ -199,7 +219,27 @@ void PrintList(List<int>& l1)
 	cout<<endl;
 }
 
-void Test1()
+void PrintList2(const List<int>& l1)
+{
+	List<int>::ConstIterator it = l1.Begin();
+	for (; it != l1.End(); ++it)
+	{
+		cout<<*it<<" ";
+	}
+	cout<<endl;
+}
+
+void PrintList3(List<int>& l1)
+{
+	List<int>::ReverseIterator it = l1.RBegin();
+	for (; it != l1.REnd(); ++it)
+	{
+		cout<<*it<<" ";
+	}
+	cout<<endl;
+}
+
+void TestList()
 {
 	List<int> l1;
 	l1.PushBack(1);
@@ -210,16 +250,17 @@ void Test1()
 	l1.PushBack(6);
 	l1.PushBack(7);
 	l1.PushBack(8);
-	PrintList(l1);
+	PrintList1(l1);
 
 	// 迭代器失效
 	List<int>::Iterator it = l1.Begin();
 	while(it != l1.End())
 	{
-		if (*it % 2 == 0)
+		if ((*it) == 0)
 			it = l1.Erase(it);
 		else
 			++it;
 	}
-	PrintList(l1);	
+	PrintList2(l1);	
+	PrintList3(l1);
 }

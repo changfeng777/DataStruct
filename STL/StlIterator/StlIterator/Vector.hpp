@@ -1,5 +1,6 @@
 #pragma once
 #include <assert.h>
+#include "StlIterator.hpp"
 
 template<class T>
 class Vector
@@ -15,11 +16,18 @@ public:
 	// 是通过特化 struct IteratorTraits<T*>的方式定义的
 	//
 	typedef ValueType* Iterator;
+	typedef const ValueType* ConstIterator;
+
+	typedef ReverseIterator<Iterator> ReverseIterator;
 
 
 	Iterator Begin() { return _start; }
 	Iterator End() { return _finish; }
+	ConstIterator Begin() const { return _start; }
+	ConstIterator End() const { return _finish; }
 
+	ReverseIterator RBegin() { return ReverseIterator(End()); }
+	ReverseIterator REnd() { return ReverseIterator(Begin()); }
 
 	size_t Size()
 	{
@@ -44,8 +52,16 @@ public:
 			size_t size = Size();
 			size_t capacity = size*2 + 3;
 			T* tmp = new T[capacity];
+
+			// 此处需要考虑类型萃取进行优化的
 			if (_start)
-				memcpy(tmp, _start, sizeof(T)*size);
+			{
+				//memcpy(tmp, _start, sizeof(T)*size);
+				for (size_t i = 0; i < size; ++i)
+				{
+					tmp[i] = _start[i];
+				}
+			}
 			
 			_start = tmp;
 			_finish = _start + size;
@@ -91,7 +107,7 @@ private:
 };
 
 // 测试Vector迭代器的使用
-void PrintVector(Vector<int>& v)
+void PrintVector1(Vector<int>& v)
 {
 	Vector<int>::Iterator it = v.Begin();
 	for (; it != v.End(); ++it)
@@ -101,7 +117,27 @@ void PrintVector(Vector<int>& v)
 	cout<<endl;
 }
 
-void Test2()
+void PrintVector2(const Vector<int>& v)
+{
+	Vector<int>::ConstIterator it = v.Begin();
+	for (; it != v.End(); ++it)
+	{
+		cout<<*it<<" ";
+	}
+	cout<<endl;
+}
+
+void PrintVector3(Vector<int>& v)
+{
+	Vector<int>::ReverseIterator it = v.RBegin();
+	for (; it != v.REnd(); ++it)
+	{
+		cout<<*it<<" ";
+	}
+	cout<<endl;
+}
+
+void TestVector()
 {
 	Vector<int> v1;
 	v1.PushBack(1);
@@ -113,7 +149,7 @@ void Test2()
 	v1.PushBack(7);
 	v1.PushBack(8);
 
-	PrintVector(v1);
+	PrintVector1(v1);
 
 	// 迭代器失效
 	Vector<int>::Iterator it = v1.Begin();
@@ -124,5 +160,7 @@ void Test2()
 		else
 			++it;
 	}
-	PrintVector(v1);
+	PrintVector1(v1);
+	PrintVector2(v1);
+	PrintVector3(v1);
 }

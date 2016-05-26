@@ -6,7 +6,7 @@ using namespace std;
 #include "Vector.hpp"
 
 // ≤‚ ‘DistanceÀ„∑®
-void Test3()
+void TestDistance()
 {
 	List<int> l1;
 	l1.PushBack(1);
@@ -27,7 +27,7 @@ void Test3()
 }
 
 // ≤‚ ‘AdvanceÀ„∑®
-void Test4()
+void TestAdvance()
 {
 	List<int> l1;
 	l1.PushBack(1);
@@ -53,10 +53,10 @@ void Test4()
 
 int main()
 {
-	//Test1();
-	//Test2();
-	Test3();
-	Test4();
+	TestVector();
+	TestList();
+	TestDistance();
+	TestAdvance();
 
 	return 0;
 }
