@@ -27,7 +27,7 @@ int main()
 	//TestRedPacket();
 
 	//TestHuffmanTree_A();
-	TestCompress();
+	TestFileCompress();
 	//TestBSTree();
 
 	//NonRecursion::TestAVLTree();

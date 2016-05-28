@@ -4,7 +4,7 @@ using namespace std;
 
 #include "HuffmanTree.hpp"
 
-typedef long LongType;
+typedef long long LongType;
 
 //#define _DEBUG_
 
@@ -90,6 +90,21 @@ public:
 		}
 	}
 
+	void _GenerateHuffmanCode(HuffmanNode<FileInfo>* root, string code)
+	{
+		if (root)
+		{
+			_GenerateHuffmanCode(root->_left, code+'0');
+			_GenerateHuffmanCode(root->_right, code+'1');
+
+			// 叶子节点则为编码节点，顺着叶子节点向上寻找Huffman编码
+			if (root->_left == NULL && root->_right == NULL)
+			{
+				_fileInfos[root->_weight._ch]._huffmanCode = code;
+			}
+		}
+	}
+
 	bool ReadLine(FILE* fOut, string& line)
 	{
 		assert(fOut);
@@ -134,6 +149,8 @@ public:
 #ifdef _DEBUG_
 		tree.LevelOrder();
 #endif
+		//string code;
+		//_GenerateHuffmanCode(tree.GetRootNode(), code);
 		_GenerateHuffmanCode(tree.GetRootNode());
 		cout<<endl;
 
@@ -160,9 +177,7 @@ public:
 				value <<= 1;
 
 				if (code[i] == '1')
-				{
 					value |= 1;
-				}
 
 				if(++pos == 8)
 				{
@@ -190,13 +205,13 @@ public:
 		char countStr[20];
 
 		// 先写入字符个数
-		_itoa(charCount>>32, countStr, 10);
+		/*_itoa(charCount>>32, countStr, 10);
 		fputs(countStr, fInConfig);
 		fputc('\n', fInConfig);
 
 		_itoa(charCount&0xFFFFFFFF, countStr, 10);
 		fputs(countStr, fInConfig);
-		fputc('\n', fInConfig);
+		fputc('\n', fInConfig);*/
 
 		for(int i = 0; i < 256; ++i)
 		{
@@ -204,6 +219,11 @@ public:
 			{
 				infoStr = _fileInfos[i]._ch;
 				infoStr += ',';
+
+				//
+				// 此处appearCount是long long, 当大文件，单个字符出现的次数
+				// 超过整型的表示范围时，需要分两段写，先写高位四个字节，再写低位四个字节
+				//
 				_itoa(_fileInfos[i]._appearCount, countStr, 10);
 				infoStr += countStr;
 				infoStr += '\n';
@@ -228,12 +248,13 @@ public:
 		LongType appearCount = 0;
 
 		// 读取文件的字符个数
-		long long charCount = 0;
+	/*	long long charCount = 0;
 		ReadLine(fOutConfig, line);
 		charCount = atoi(line.c_str());
 		charCount <<= 32;
 		ReadLine(fOutConfig, line);
 		charCount += atoi(line.c_str());
+		line.clear();*/
 
 		while(ReadLine(fOutConfig, line))
 		{
@@ -261,7 +282,14 @@ public:
 #ifdef _DEBUG_
 		tree.LevelOrder();
 #endif
+		//
+		// Huffman树的根节点的权值就是所有文件字符出现次数的和，
+		// 也就是文件字符出现的次数
+		//
 		HuffmanNode<FileInfo>* root = tree.GetRootNode();
+		long long charCount = 0;
+		charCount = root->_weight._appearCount;
+		cout<<"解压缩"<<charCount<<"个字符"<<endl;
 
 		// 3. 读取压缩信息，根据重建的Huffman树解压缩
 		string uncompressFileName = fileName;
@@ -317,17 +345,26 @@ private:
 void TestCompress()
 {
 	FileCompress fc;
+
 	int begin = GetTickCount();
-
-	fc.Compress("Input");
-
+	fc.Compress("Input.BIG");
 	int end = GetTickCount();
+
 	cout<<"Compress:"<<end - begin<<endl;
+}
 
-	begin = GetTickCount();
+void TestUncompress()
+{
+	FileCompress fc;
+	int begin = GetTickCount();
+	fc.Uncompress("Input.BIG");
+	int end = GetTickCount();
 
-	fc.Uncompress("Input");
-
-	end = GetTickCount();
 	cout<<"Compress:"<<end - begin<<endl;
+}
+
+void TestFileCompress()
+{
+	TestCompress();
+	TestUncompress();
 }
