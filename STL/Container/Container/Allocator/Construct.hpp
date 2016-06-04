@@ -33,7 +33,7 @@ inline void
 __Destroy(ForwardIterator first, ForwardIterator last, T*)
 {
 	typedef typename __TypeTraits<T>::HasTrivialDestructor TrivialDestructor;
-	__DestroyAux(first, last, TrivialDestructor);
+	__DestroyAux(first, last, TrivialDestructor());
 }
 
 template <class ForwardIterator>

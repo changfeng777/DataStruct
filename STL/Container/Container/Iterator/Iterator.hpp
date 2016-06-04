@@ -9,6 +9,52 @@ struct ForwardIteratorTag : public InputIteratorTag {};
 struct BidirectionalIteratorTag : public ForwardIteratorTag {};
 struct RandomAccessIteratorTag : public BidirectionalIteratorTag {};
 
+
+template <class T, class Distance>
+struct InputIterator {
+	typedef InputIteratorTag IteratorCategory;
+	typedef T                  ValueType;
+	typedef Distance           DifferenceType;
+	typedef T*                 Pointer;
+	typedef T&                 Reference;
+};
+
+struct OutputIterator {
+	typedef OutputIteratorTag IteratorCategory;
+	typedef void                ValueType;
+	typedef void                DifferenceType;
+	typedef void                Pointer;
+	typedef void                Reference;
+};
+
+template <class T, class Distance> 
+struct ForwardIterator {
+	typedef ForwardIteratorTag IteratorCategory;
+	typedef T                    ValueType;
+	typedef Distance             DifferenceType;
+	typedef T*                   Pointer;
+	typedef T&                   Reference;
+};
+
+
+template <class T, class Distance>
+struct BidirectionalIterator {
+	typedef BidirectionalIteratorTag IteratorCategory;
+	typedef T                          ValueType;
+	typedef Distance                   DifferenceType;
+	typedef T*                         Pointer;
+	typedef T&                         Reference;
+};
+
+template <class T, class Distance>
+struct RandomAccessIterator {
+	typedef RandomAccessIteratorTag IteratorCategory;
+	typedef T                          ValueType;
+	typedef Distance                   DifferenceType;
+	typedef T*                         Pointer;
+	typedef T&                         Reference;
+};
+
 //
 // 迭代器内嵌包含的5种相应的型别
 // Iterator Category、Value Type、Difference Type、Pointer、Reference
@@ -127,6 +173,31 @@ inline void Advance(InputIterator& i, Distance n)
 }
 
 //////////////////////////////////////////////////////////////////////
+//
+template <class T, class Distance> 
+inline T* ValueType(const InputIterator<T, Distance>&) {
+	return (T*)(0); 
+}
+
+template <class T, class Distance> 
+inline T* ValueType(const ForwardIterator<T, Distance>&) {
+	return (T*)(0);
+}
+
+template <class T, class Distance> 
+inline T* ValueType(const BidirectionalIterator<T, Distance>&) {
+	return (T*)(0);
+}
+
+template <class T, class Distance> 
+inline T* ValueType(const RandomAccessIterator<T, Distance>&) {
+	return (T*)(0);
+}
+
+template <class T>
+inline T* ValueType(const T*) { return (T*)(0); }
+
+//////////////////////////////////////////////////////////////////////
 // 逆置迭代器的定义，反向迭代器是正向迭代一层封装
 
 template <class Iterator>
@@ -139,7 +210,7 @@ public:
 	typedef typename IteratorTraits<Iterator>::ValueType
 		ValueType;
 	typedef typename IteratorTraits<Iterator>::DifferenceType
-		Difference_type;
+		DifferenceType;
 	typedef typename IteratorTraits<Iterator>::Pointer
 		Pointer;
 	typedef typename IteratorTraits<Iterator>::Reference

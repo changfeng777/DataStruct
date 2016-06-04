@@ -51,22 +51,39 @@ public:
 		,_endOfStorage(NULL)
 	{}
 
+	~Vector()
+	{
+		if (_start)
+		{
+			Destroy(_start, _finish);
+			DataAllocator::Deallocate(_start, Size());
+		}
+	}
+
+
 	void _CheckExpand()
 	{
 		if (_finish == _endOfStorage)
 		{
 			size_t size = Size();
 			size_t capacity = size*2 + 3;
-			T* tmp = new T[capacity];
+			//T* tmp = new T[capacity];
 
-			// 此处需要考虑类型萃取进行优化的
+			//// 此处需要考虑类型萃取进行优化的
+			//if (_start)
+			//{
+			//	//memcpy(tmp, _start, sizeof(T)*size);
+			//	for (size_t i = 0; i < size; ++i)
+			//	{
+			//		tmp[i] = _start[i];
+			//	}
+			//}
+
+			// 使用空间配置器及拷贝算法
+			T* tmp = DataAllocator::Allocate(capacity);
 			if (_start)
 			{
-				//memcpy(tmp, _start, sizeof(T)*size);
-				for (size_t i = 0; i < size; ++i)
-				{
-					tmp[i] = _start[i];
-				}
+				UninitializedCopy(_start, _start+size, tmp);
 			}
 			
 			_start = tmp;
@@ -81,7 +98,8 @@ public:
 
 		assert(_finish != _endOfStorage);
 
-		*_finish = x;
+		//*_finish = x;
+		Construct(_finish, x);
 		++_finish;
 	}
 

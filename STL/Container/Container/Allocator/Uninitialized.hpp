@@ -1,5 +1,6 @@
 #pragma once
 #include "TypeTraits.hpp"
+#include "Iterator/Iterator.hpp"
 
 // 拷贝一段未初始化的数据
 template <class InputIterator, class ForwardIterator>
@@ -7,6 +8,8 @@ inline ForwardIterator
 __UninitializedCopyAux(InputIterator first, InputIterator last,
 						 ForwardIterator result, __TrueType)
 {
+	// 这里实际是调用的C++库里的copy
+	// 内部要通过模板推演出数据的类型，再调用memcpy
 	return copy(first, last, result);
 }
 
@@ -18,6 +21,8 @@ __UninitializedCopyAux(InputIterator first, InputIterator last,
 	 ForwardIterator cur = result;
 	 for ( ; first != last; ++first, ++cur)
 		 Construct(&*cur, *first);
+
+	 Destroy(first, last);
 
 	 return cur;
 }

@@ -94,7 +94,7 @@ public:
 //
 // 设计为双向循环链表
 //
-template<class T>
+template<class T, class _Alloc = Alloc>
 class List
 {
 public:
@@ -106,10 +106,27 @@ public:
 	typedef ReverseIterator<Iterator> ReverseIterator;
 
 	typedef T ValueType;
-	typedef __ListNode<T>* LinkType; 
+	typedef __ListNode<T>* LinkType;
+
+	// 重定义空间配置器
+	typedef SimpleAlloc<__ListNode<T>, _Alloc> DataAllocator;
+
+	__ListNode<T>* BuyNode(const T& x = T())
+	{
+		__ListNode<T>* node = DataAllocator::Allocate();
+		Construct(node, x);
+
+		return node;
+	}
+
+	void DestoryNode(__ListNode<T>* node)
+	{
+		Destroy(node);
+		DataAllocator::Deallocate(node);
+	}
 
 	List()
-		:_head(new __ListNode<T>())
+		:_head(BuyNode())
 	{
 		_head->_prev = _head;
 		_head->_next = _head;
@@ -124,7 +141,7 @@ public:
 	// 在pos前插入一个节点
 	void Insert(Iterator pos, const ValueType& x)
 	{
-		LinkType tmp = new __ListNode<T>(x);
+		LinkType tmp = BuyNode(x);
 		LinkType prev = pos._node->_prev;
 		LinkType cur = pos._node;
 
@@ -154,7 +171,8 @@ public:
 		prev->_next = next;
 		next->_prev = prev;
 
-		delete pos._node;
+		//delete pos._node;
+		DestoryNode(pos._node);
 
 		return Iterator(next);
 	}
@@ -198,9 +216,10 @@ public:
 		Iterator begin = Begin();
 		while(begin != End())
 		{
-			LinkType tmp = begin._node;
+			LinkType del = begin._node;
 			++begin;
-			delete tmp;
+			//delete del;
+			DestoryNode(del);
 		}
 	}
 

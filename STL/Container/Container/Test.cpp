@@ -6,7 +6,7 @@ using namespace std;
 
 int main()
 {
-	TestVector();
+	//TestVector();
 	TestList();
 
 	return 0;
