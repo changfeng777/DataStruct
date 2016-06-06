@@ -18,13 +18,19 @@ ForwardIterator
 __UninitializedCopyAux(InputIterator first, InputIterator last,
 						 ForwardIterator result, __FalseType)
 {
-	 ForwardIterator cur = result;
-	 for ( ; first != last; ++first, ++cur)
-		 Construct(&*cur, *first);
+	ForwardIterator cur = result;
+	try
+	{
+		 for ( ; first != last; ++first, ++cur)
+			 Construct(&*cur, *first);
+	}
+	catch(...)
+	{
+		Destroy(first, last);
+		throw;
+	}
 
-	 Destroy(first, last);
-
-	 return cur;
+	return cur;
 }
 
 template <class InputIterator, class ForwardIterator, class T>

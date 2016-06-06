@@ -55,8 +55,10 @@ public:
 	{
 		if (_start)
 		{
+			// 1.调用析构函数
+			// 2.调用空间适配器释放空间
 			Destroy(_start, _finish);
-			DataAllocator::Deallocate(_start, Size());
+			DataAllocator::Deallocate(_start, _endOfStorage-_start);
 		}
 	}
 
@@ -85,6 +87,11 @@ public:
 			{
 				UninitializedCopy(_start, _start+size, tmp);
 			}
+
+			// 1.调用析构函数
+			// 2.调用空间适配器释放空间
+			Destroy(_start, _finish);
+			DataAllocator::Deallocate(_start, _endOfStorage-_start);
 			
 			_start = tmp;
 			_finish = _start + size;
