@@ -65,7 +65,6 @@ void ShellSort(int* array, int size)
 // 选择排序
 void SelectSort(int* array, int size)
 {
-	int statistics = 0;
 	assert(array);
 
 	for (int begin = 0; begin < size - 1; ++begin)
@@ -78,8 +77,6 @@ void SelectSort(int* array, int size)
 			{
 				minIndex = index;
 			}
-
-			++statistics;
 		}
 
 		if (minIndex != begin)
@@ -87,8 +84,6 @@ void SelectSort(int* array, int size)
 			swap(array[minIndex], array[begin]);
 		}
 	}
-
-	cout<<"statistics:"<<statistics<<endl;
 }
 
 //
@@ -108,25 +103,15 @@ void SelectSort(int* array, int size)
 //		for (int index = begin + 1; index <= end; ++index)
 //		{
 //			if (array[minIndex] > array[index])
-//			{
 //				minIndex = index;
-//			}
 //
 //			if (array[maxIndex] < array[index])
-//			{
 //				maxIndex = index;
-//			}
 //		}
 //
-//		if (minIndex != begin)
-//		{
-//			swap(array[minIndex], array[begin]);
-//		}
+//		swap(array[minIndex], array[begin]);
 //
-//		if (maxIndex != end)
-//		{
-//			swap(array[maxIndex], array[end]);
-//		}
+//		swap(array[maxIndex], array[end]);
 //
 //		--end;
 //	}
@@ -137,21 +122,29 @@ void SelectSort_OP(int* array, int size)
 {
 	assert(array);
 
-	int begin = 0, end = size - 1;
-	while (begin < end)
+	int end = size - 1;
+	for (int begin = 0; begin < end; ++begin)
 	{
-		int cur = begin;
-		while (cur < end)
+		// 一次选出最大数据及最小数据
+		int minIndex = begin;
+		int maxIndex = begin;
+		for (int index = begin + 1; index <= end; ++index)
 		{
-			if (array[begin] > array[cur])
-				swap(array[begin], array[cur]);
-			if (array[end] < array[cur])
-				swap(array[end], array[cur]);
+			if (array[minIndex] > array[index])
+				minIndex = index;
 
-			++cur;
+			if (array[maxIndex] < array[index])
+				maxIndex = index;
 		}
 
-		++begin;
+		swap(array[minIndex], array[begin]);
+
+		// 如果恰好最大的数据在开始的位置，则修正最大数据的位置
+		if(maxIndex == begin)
+			maxIndex = minIndex;
+
+		swap(array[maxIndex], array[end]);
+
 		--end;
 	}
 }
@@ -240,32 +233,20 @@ int GetMidIndex(int* array, int left, int right)
 	if (array[left] < array[right])
 	{
 		if (array[right] < array[mid])
-		{
 			return right;
-		}
 		else if (array[left] > array[mid])
-		{
 			return left;
-		}
 		else
-		{
 			return mid;
-		}
 	}
 	else
 	{
 		if (array[right] > array[mid])
-		{
 			return right;
-		}
 		else if (array[left] < array[mid])
-		{
 			return left;
-		}
 		else
-		{
 			return mid;
-		}
 	}
 }
 
@@ -290,9 +271,7 @@ int Partion1(int* array, int left, int right)
 	{
 		// 找到比key的小的数据则与前面的数据进行交换
 		if(array[cur] < key && ++prev != cur)
-		{
 			swap(array[cur], array[prev]);
-		}
 
 		++cur;
 	}
@@ -319,27 +298,19 @@ int Partion2(int* array, int left, int right)
 	{
 		// 从左往右找到比key大的数据时停下
 		while (array[begin] <= key && begin < end)
-		{
 			++begin;
-		}
 
 		// 从右往左找到比key小的数据时停下
 		while (array[end] >= key && begin < end)
-		{
 			--end;
-		}
 
 		// 若位置还没有交错，则交换着两个数据。
 		if (begin < end)
-		{
 			swap(array[begin], array[end]);
-		}
 	}
 
 	if (begin != right)
-	{
 		swap(array[begin], array[right]);
-	}
 
 	return begin;
 }
@@ -350,9 +321,7 @@ int Partion3(int* array, int left, int right)
 	// 三数取中
 	int keyIndex = GetMidIndex(array, left, right);
 	if (keyIndex != right)
-	{
 		swap(array[keyIndex], array[right]);
-	}
 
 	// key取最后一个数据
 	int key = array[right];
@@ -363,27 +332,19 @@ int Partion3(int* array, int left, int right)
 	{
 		// 从左往右找到比key大的数据时停下
 		while (array[begin] <= key && begin < end)
-		{
 			++begin;
-		}
 
 		// 找到一个比key大的数填到end，形成一个新的坑begin
 		if (begin < end)
-		{
 			array[end--] = array[begin];
-		}
 
 		// 从右往左找到比key小的数据时停下
 		while (array[end] >= key && begin < end)
-		{
 			--end;
-		}
 
 		// 找到一个比key小的数填到begin，形成一个新的坑end
 		if (begin < end)
-		{
 			array[begin++] = array[end];
-		}
 	}
 
 	// 将key填到最后留下的坑
@@ -459,23 +420,15 @@ void _Merge(int* src, int* dst, int begin, int mid, int end)
 	while (begin1 < end1 && begin2 < end2)
 	{
 		if (src[begin1] < src[begin2])
-		{
 			dst[index++] = src[begin1++];
-		}
 		else
-		{
 			dst[index++] = src[begin2++];
-		}
 	}
 
 	if (begin1 < end1)
-	{
 		memcpy(dst + index, src+begin1, sizeof(int)*(end1-begin1));
-	}
 	else if (begin2 < end2)
-	{
 		memcpy(dst + index, src+begin2, sizeof(int)*(end2-begin2));
-	}
 
 	// 将合并的数据拷贝回src数组中
 	memcpy(src+begin, dst+begin, sizeof(int)*(end - begin));
@@ -533,7 +486,6 @@ void _MergeSort_R_OP(int* src, int* dst, int left, int right)
 
 	// 当区间比较小时，使用插入排序减少递归更高效一些
 	if (right - left < 13)
-	//if (right - left < 5)
 	{
 		InsertSort(src+left, right - left);
 		return;
@@ -670,11 +622,11 @@ void _RadixSort_MSD(int* array, int left, int right, int bit, int* bucket, int* 
 	assert(count);
 
 	// 当区间小于一定数值时，直接使用插入排序，这样更高效
-	if (right - left < 5)
+	/*if (right - left < 5)
 	{
 		InsertSort(array+left, right-left);
 		return;
-	}
+	}*/
 
 	int radix = pow(10.0, bit-1);
 	memset(count, 0, sizeof(int)*10);
@@ -698,9 +650,9 @@ void _RadixSort_MSD(int* array, int left, int right, int bit, int* bucket, int* 
 	}
 
 	// 将桶中排后数据拷贝回原数组
-	memcpy(array, bucket, sizeof(int)*(right-left));
+	memcpy(array+left, bucket+left, sizeof(int)*(right-left));
 
-	// 对区间进行递归排序
+	// 对每个基数的区间分别进行递归排序
 	for (int i = 0; i < 10; ++i)
 	{
 		int interval1 = left + count[i];
@@ -722,13 +674,12 @@ void RadixSort_MSD(int* array, int size)
 	delete[] bucket;
 }
 
-
 /////////////////////////////////////////////////////
 // 测试代码
 
 #define SIZE 10
 
-void Test1()
+void TestBubbleSort()
 {
 	cout<<"BubbleSort:"<<endl;
 	int array[SIZE] = {2, 5, 4, 9, 3, 6, 8, 7, 1, 0};
@@ -738,7 +689,7 @@ void Test1()
 	PrintArray(array, SIZE);
 }
 
-void Test2()
+void TestSelectSort()
 {
 	cout<<"SelectSort:"<<endl;
 
@@ -751,19 +702,18 @@ void Test2()
 	PrintArray(array, 7);
 }
 
-void Test3()
+void TestShellSort()
 {
-	cout<<"InsertSort:"<<endl;
+	cout<<"ShellSort:"<<endl;
 
 	int array[SIZE] = {2, 5, 4, 9, 3, 6, 8, 7, 1, 0};
 	PrintArray(array, SIZE);
 
-	//InsertSort(array, SIZE);
 	ShellSort(array, SIZE);
 	PrintArray(array, SIZE);
 }
 
-void Test4()
+void TestHeapSort()
 {
 	cout<<"HeapSort:"<<endl;
 
@@ -774,18 +724,7 @@ void Test4()
 	PrintArray(array, SIZE);
 }
 
-void Test5()
-{
-	cout<<"HeapSort:"<<endl;
-
-	int array[SIZE] = {2, 5, 4, 9, 3, 6, 8, 7, 1, 0};
-	PrintArray(array, SIZE);
-
-	HeapSort(array, SIZE);
-	PrintArray(array, SIZE);
-}
-
-void Test6()
+void TestQuickSort()
 {
 	cout<<"QuickSort:"<<endl;
 
@@ -799,7 +738,7 @@ void Test6()
 	PrintArray(array, SIZE);
 }
 
-void Test7()
+void TestMergeSort()
 {
 	cout<<"MergeSort:"<<endl;
 
@@ -812,7 +751,7 @@ void Test7()
 	PrintArray(array, SIZE);
 }
 
-void Test8()
+void TestCountSort()
 {
 	cout<<"CountSort:"<<endl;
 
@@ -824,15 +763,15 @@ void Test8()
 	PrintArray(array, SIZE);
 }
 
-void Test9()
+void TestRadixSort()
 {
 	cout<<"RadixSort:"<<endl;
 
 	int array[SIZE] = {21, 51, 22, 26000, 300, 6, 240, 7, 10, 10};
 	PrintArray(array, SIZE);
 
-	RadixSort_LSD(array, SIZE);
-	//RadixSort_MSD(array, SIZE);
+	//RadixSort_LSD(array, SIZE);
+	RadixSort_MSD(array, SIZE);
 
 	PrintArray(array, SIZE);
 }
