@@ -13,11 +13,9 @@ template<class V, class W>
 class GraphMatrix
 {
 public:
-	GraphMatrix()
-	{}
-
-	GraphMatrix(const V* vertexs, int size)
+	GraphMatrix(const V* vertexs, int size, bool isDirected)
 		:_vertexSize(size)
+		,_isDirected(isDirected)
 	{
 		// 开辟矩阵和边集
 		_matrix = new W*[_vertexSize];
@@ -54,9 +52,16 @@ public:
 
 		assert(srcIndex != -1);
 		assert(dstIndex != -1);
-		
-		_matrix[srcIndex][dstIndex] = weight;
-		//_matrix[dstIndex][srcIndex] = weight;
+
+		if (_isDirected)
+		{
+			_matrix[srcIndex][dstIndex] = weight;
+		}
+		else
+		{
+			_matrix[srcIndex][dstIndex] = weight;
+			_matrix[dstIndex][srcIndex] = weight;
+		}
 	}
 
 	void Display()
@@ -81,14 +86,16 @@ public:
 private:
 	W**	 _matrix;		// 临接矩阵
 	V*	 _vertexs;		// 顶点集			
-	int	 _vertexSize;	// 顶点数
+	int	 _vertexSize;		// 顶点数
 	//int	 _edgeSize;		// 边条数
+
+	bool _isDirected;
 };
 
 // 无向图
 void Test1()
 {
-	GraphMatrix<char, int> g("ABCDE", 5);
+	GraphMatrix<char, int> g("ABCDE", 5, false);
 	g.AddEdge('A', 'D', 10);
 	g.AddEdge('A', 'E', 20);
 	g.AddEdge('B', 'C', 10);
@@ -102,7 +109,7 @@ void Test1()
 // 有向图
 void Test2()
 {
-	GraphMatrix<char, int> g("ABCDE", 5);
+	GraphMatrix<char, int> g("ABCDE", 5, true);
 	g.AddEdge('A', 'D', 10);
 	g.AddEdge('E', 'A', 20);
 	g.AddEdge('B', 'C', 10);
@@ -134,18 +141,6 @@ struct LinkEdge
 };
 
 template<class V, class W>
-struct LinkVertex
-{
-	V _vertex;				// 顶点
-	LinkEdge<V, W>* _head;	// 指向临接表的边
-
-	LinkVertex(const V& vertex = V())
-		:_vertex(vertex)
-		,_head(NULL)
-	{}
-};
-
-template<class V, class W>
 struct CompareLinkEdge
 {
 	bool operator()(LinkEdge<V, W>* lhs, LinkEdge<V, W>* rhs)
@@ -157,36 +152,33 @@ struct CompareLinkEdge
 template<class V, class W>
 class GraphLink
 {
+protected:
+	vector<V> _vertexs;						// 顶点集合
+	vector<LinkEdge<V,W>*> _linkTables;		// 临接表
+	bool _isDirected;						// 是否是有向图
 public:
-	GraphLink(bool isDigraph = false)
-		:_linkTable(0)
-		,_vertexSize(0)
-		,_isDigraph(isDigraph)
+	GraphLink(bool isDirected = false)
+		:_isDirected(isDirected)
 	{}
 
-	GraphLink(const V* ar, int size, bool isDigraph = false)
-		:_vertexSize(size)
-		,_isDigraph(isDigraph)
+	GraphLink(const V* ar, int size, bool isDirected = false)
+		:_isDirected(isDirected)
 	{
-		_linkTable = new LinkVertex<V, W>[size];
-		for (int i = 0; i < size; ++i)
+		_vertexs.resize(size);
+		_linkTables.resize(size);
+		for (size_t i = 0; i < size; ++i)
 		{
-			_linkTable[i]._vertex = ar[i];
+			_vertexs[i] = ar[i];
 		}
 	}
-
-	~GraphLink()
-	{}
 
 public:
 	int GetVertexIndex(const V& vertex)
 	{
-		for (int i = 0; i < _vertexSize; ++i)
+		for (int i = 0; i < _vertexs.size(); ++i)
 		{
-			if(_linkTable[i]._vertex == vertex)
-			{
+			if(_vertexs[i] == vertex)
 				return i;
-			}
 		}
 
 		return -1;
@@ -194,11 +186,10 @@ public:
 
 	void _AddEdge(int srcIndex, int dstIndex, const W& weight)
 	{
-		LinkEdge<V, W>* head = _linkTable[srcIndex]._head;
 		LinkEdge<V, W>* tmp = new LinkEdge<V, W>(srcIndex, dstIndex, weight);
 
-		tmp->_next = head;
-		_linkTable[srcIndex]._head = tmp;
+		tmp->_next = _linkTables[srcIndex];
+		_linkTables[srcIndex] = tmp;
 	}
 
 	void AddEdge(const V& src, const V& dst, const W& weight)
@@ -210,7 +201,7 @@ public:
 		assert(dstIndex != -1);
 
 		// 无向图
-		if(_isDigraph)
+		if(_isDirected)
 		{
 			_AddEdge(srcIndex, dstIndex, weight);
 		}
@@ -223,10 +214,10 @@ public:
 
 	void Display()
 	{
-		for (int i = 0; i < _vertexSize; ++i)
+		for (int i = 0; i < _vertexs.size(); ++i)
 		{
-			cout<<_linkTable[i]._vertex<<"["<<i<<"]->";
-			LinkEdge<V, W>* begin = _linkTable[i]._head;
+			cout<<_vertexs[i]<<"["<<i<<"]->";
+			LinkEdge<V, W>* begin = _linkTables[0];
 			while (begin)
 			{
 				cout<<begin->_weight<<"["<<begin->_dstIndex<<"]""->";
@@ -239,15 +230,10 @@ public:
 		cout<<endl;
 	}
 
-	LinkEdge<V,W>* _GetFirstEdge(int src)
-	{
-		return _linkTable[src]._head;
-	}
-
 	// 获取临接表里的下一条边
 	LinkEdge<V,W>* _GetNextEdge(int src, int cur)
 	{
-		LinkEdge<V,W>* edge = _linkTable[src]._head;
+		LinkEdge<V,W>* edge = _linkTables[src];
 		while (edge)
 		{
 			if (edge->_dstIndex == cur)
@@ -260,14 +246,24 @@ public:
 		return NULL;
 	}
 
-	void DFS(int cur)
+	void DFS()
 	{
 		cout<<"DFS:";
 
-		bool* visited = new bool[_vertexSize];
-		memset(visited, false, sizeof(bool)*_vertexSize);
+		bool* visited = new bool[_vertexs.size()];
+		memset(visited, false, sizeof(bool)*_vertexs.size());
 
-		_DFS(cur, visited);
+		for (size_t i = 0; i < _vertexs.size(); ++i)
+		{
+			if (visited[i] == false)
+			{
+				// 1.访问当前节点
+				cout<<_vertexs[i]<<" ";
+				visited[i] = true;
+
+				_DFS(i, visited);
+			}
+		}
 
 		delete[] visited;
 
@@ -276,37 +272,37 @@ public:
 
 	void _DFS(int src, bool* visited)
 	{
-		// 1.访问当前节点
-		//cout<<_linkTable[src]._vertex<<" ";
-		visited[src] = true;
-
 		// 2.获取当前临接表的第一个顶点
-		LinkEdge<V,W>* edge = _GetFirstEdge(src);
+		LinkEdge<V,W>* edge = _linkTables[src];
 
 		// 3.依次获取临接表后面的顶点进行深度优先遍历
 		while (edge)
 		{
 			if (visited[edge->_dstIndex] == false)
 			{
-				cout<<_linkTable[edge->_srcIndex]._vertex<<"->"
-					<<_linkTable[edge->_dstIndex]._vertex<<" ";
+				cout<<_vertexs[edge->_dstIndex]<<" ";
+				visited[edge->_dstIndex] = true;
 
 				_DFS(edge->_dstIndex, visited);
 			}
 
-			// 4.查找当前顶点的下一个顶点
-			//edge = _GetNextEdge(src, edge->_dstIndex);
 			edge = edge->_next;
 		}
 	}
 
-	void BFS(int cur)
+	void BFS()
 	{
 		cout<<"BFS:";
-		bool* visited = new bool[_vertexSize];
-		memset(visited, false, sizeof(bool)*_vertexSize);
+		bool* visited = new bool[_vertexs.size()];
+		memset(visited, false, sizeof(bool)*_vertexs.size());
 
-		_BFS(cur, visited);
+		for (size_t i = 0; i < _vertexs.size(); ++i)
+		{
+			if (visited[i] == false)
+			{
+				_BFS(i, visited);
+			}
+		}
 
 		delete[] visited;
 
@@ -315,7 +311,7 @@ public:
 	
 	void _BFS(int cur, bool* visited)
 	{
-		//cout<<_linkTable[cur]._vertex<<" ";
+		cout<<_vertexs[cur]<<" ";
 		visited[cur] = true;
 
 		queue<int> q;
@@ -325,20 +321,17 @@ public:
 			cur = q.front();
 			q.pop();
 
-			LinkEdge<V,W>* edge = _GetFirstEdge(cur);
+			LinkEdge<V,W>* edge = _linkTables[cur];
 			while (edge)
 			{
 				if (visited[edge->_dstIndex] == false)
 				{
-					//cout<<_linkTable[edge->_dstIndex]._vertex<<" ";
-					cout<<_linkTable[edge->_srcIndex]._vertex<<"->"
-						<<_linkTable[edge->_dstIndex]._vertex<<" ";
+					cout<<_vertexs[edge->_dstIndex]<<" ";
 
 					visited[edge->_dstIndex] = true;
 					q.push(edge->_dstIndex);
 				}
 
-				//edge = _GetNextEdge(cur, edge->_dstIndex);
 				edge = edge->_next;
 			}
 		}
@@ -347,21 +340,18 @@ public:
 	bool Kruskal(GraphLink& minSpanTree)
 	{
 		// 1.初始化最小生成树
-		minSpanTree._linkTable = new LinkVertex<V, W>[_vertexSize];
-		minSpanTree._vertexSize = _vertexSize;
-		for (int i = 0; i < _vertexSize; ++i)
-		{
-			minSpanTree._linkTable[i]._vertex = _linkTable[i]._vertex;
-		}
+		minSpanTree._vertexs = _vertexs;
+		minSpanTree._linkTables.resize(_vertexs.size());
+		minSpanTree._isDirected = _isDirected;
 
 		//
 		// 2.将所有的边放到一个最小堆
 		// 假设有V个顶点，E条边
 		// 
 		Heap<LinkEdge<V,W>*, CompareLinkEdge<V,W>> minHeap;
-		for (int i = 0; i < _vertexSize; ++i)
+		for (int i = 0; i < _vertexs.size(); ++i)
 		{
-			LinkEdge<V, W>* begin = _linkTable[i]._head;
+			LinkEdge<V, W>* begin = _linkTables[i];
 			while (begin)
 			{
 				// 无向图的边需要进行过滤
@@ -375,8 +365,8 @@ public:
 		}
 		
 		// 3.使用并差集和最小堆构建最小生成树
-		UnionFindSet UFSet(_vertexSize);
-		int count = _vertexSize;
+		UnionFindSet UFSet(_vertexs.size());
+		int count = _vertexs.size();
 		while (--count)
 		{
 			if (minHeap.Empty())
@@ -386,8 +376,8 @@ public:
 
 			LinkEdge<V,W>* edge = minHeap.Top();
 			minHeap.Pop();
-			int src = UFSet.Find(edge->_srcIndex);
-			int dst = UFSet.Find(edge->_dstIndex);
+			int src = UFSet.FindRoot(edge->_srcIndex);
+			int dst = UFSet.FindRoot(edge->_dstIndex);
 
 			if(src != dst)
 			{
@@ -402,15 +392,12 @@ public:
 	bool Prim(GraphLink& minSpanTree)
 	{
 		// 1.初始化最小生成树
-		minSpanTree._linkTable = new LinkVertex<V, W>[_vertexSize];
-		minSpanTree._vertexSize = _vertexSize;
-		for (int i = 0; i < _vertexSize; ++i)
-		{
-			minSpanTree._linkTable[i]._vertex = _linkTable[i]._vertex;
-		}
+		minSpanTree._vertexs = _vertexs;
+		minSpanTree._linkTables.resize(_vertexs.size());
+		minSpanTree._isDirected = _isDirected;
 
-		bool* visitedSet = new bool[_vertexSize];
-		memset(visitedSet, false, sizeof(bool)*_vertexSize);
+		bool* visitedSet = new bool[_vertexs.size()];
+		memset(visitedSet, false, sizeof(bool)*_vertexs.size());
 
 		int src = 0;
 		visitedSet[src] = true;
@@ -420,7 +407,7 @@ public:
 		do 
 		{
 			// 2.取出一个顶点所有未访问过的临接边放到一个最小堆里面
-			LinkEdge<V, W>* edge = _GetFirstEdge(src);
+			LinkEdge<V, W>* edge = _linkTables[src];
 			while(edge)
 			{
 				if (visitedSet[edge->_dstIndex] == false)
@@ -432,7 +419,7 @@ public:
 			}
 
 			// 2.选出堆中最小的边加入生成树
-			while(!minHeap.Empty() && count < _vertexSize)
+			while(!minHeap.Empty() && count < _vertexs.size())
 			{
 				edge = minHeap.Top();
 				minHeap.Pop();
@@ -446,7 +433,7 @@ public:
 					break;
 				}  
 			}
-		}while (count < _vertexSize);
+		}while (count < _vertexs.size());
 
 		return true;
 	}
@@ -456,7 +443,7 @@ public:
 		if (src == dst)
 			return maxValue;
 
-		LinkEdge<V,W>* edge = _linkTable[src]._head;
+		LinkEdge<V,W>* edge = _linkTables[src];
 		while (edge)
 		{
 			if (edge->_dstIndex == dst)
@@ -625,25 +612,20 @@ public:
 
 	void Dijkstra(int src, const W& maxValue)
 	{
-		W* dist = new W[_vertexSize];
-		int* path = new int[_vertexSize];
-		bool* vSet = new bool[_vertexSize];
+		W* dist = new W[_vertexs.size()];
+		int* path = new int[_vertexs.size()];
+		bool* vSet = new bool[_vertexs.size()];
 
-		//_Dijkstra(src, dist, path, vSet, _vertexSize, maxValue);
-		_Dijkstra_OP(src, dist, path, vSet, _vertexSize, maxValue);
+		//_Dijkstra(src, dist, path, vSet, _vertexs.size(), maxValue);
+		_Dijkstra_OP(src, dist, path, vSet, _vertexs.size(), maxValue);
 
 		// 打印最短路径
-		PrintPath(src, dist, path, _vertexSize);
+		PrintPath(src, dist, path, _vertexs.size());
 
 		delete[] dist;
 		delete[] path;
 		delete[] vSet;
 	}
-
-protected:
-	LinkVertex<V, W>* _linkTable;	// 临接表
-	int _vertexSize;				// 顶点个数
-	bool _isDigraph;				// 是否是有向图
 };
 
 // 无向图
@@ -669,8 +651,8 @@ void Test3()
 	g.Prim(minSpanTree2);
 	minSpanTree2.Display();
 
-	g.DFS(0);
-	g.BFS(0);
+	g.DFS();
+	g.BFS();
 }
 
 // 有向图

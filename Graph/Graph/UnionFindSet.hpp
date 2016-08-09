@@ -20,17 +20,20 @@ public:
 	}
 
 	// 将集合root2合并到集合root1中
-	void Union(int root1, int root2)
+	void Union(int x1, int x2)
 	{
-		assert(_parent[root1] < 0);
-		assert(_parent[root2]< 0);
+		int root1 = FindRoot(x1);
+		int root2 = FindRoot(x2);
 
-		_parent[root1] += _parent[root2];
-		_parent[root2] = root1;
+		if (root1 != root2)
+		{
+			_parent[root1] += _parent[root2];
+			_parent[root2] = root1;
+		}
 	}
 
 	// 查找x的根节点
-	int Find(int x)
+	int FindRoot(int x)
 	{
 		int cur = x;
 		while (_parent[cur] >= 0)
