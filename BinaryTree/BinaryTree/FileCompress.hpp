@@ -72,13 +72,9 @@ public:
 				while (parent)
 				{
 					if (parent->_left == cur)
-					{
 						code += '0';
-					}
 					else
-					{
 						code += '1';
-					}
 
 					cur = parent;
 					parent = cur->_parent;
@@ -90,12 +86,13 @@ public:
 		}
 	}
 
-	void _GenerateHuffmanCode(HuffmanNode<FileInfo>* root, string code)
+	// 递归的方式生成编码
+	void _GenerateHuffmanCode_R(HuffmanNode<FileInfo>* root, string code)
 	{
 		if (root)
 		{
-			_GenerateHuffmanCode(root->_left, code+'0');
-			_GenerateHuffmanCode(root->_right, code+'1');
+			_GenerateHuffmanCode_R(root->_left, code+'0');
+			_GenerateHuffmanCode_R(root->_right, code+'1');
 
 			// 叶子节点则为编码节点，顺着叶子节点向上寻找Huffman编码
 			if (root->_left == NULL && root->_right == NULL)
@@ -265,6 +262,7 @@ public:
 			{
 				//sscanf(line.c_str(), "%s,%d", ch, appearCount);
 				ch = line[0];
+
 				_fileInfos[(unsigned char)ch]._appearCount = atoi(line.substr(2).c_str());
 				line.clear();
 			}

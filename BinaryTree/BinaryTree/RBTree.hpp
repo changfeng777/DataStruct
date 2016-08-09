@@ -38,12 +38,6 @@ public:
 		:_root(NULL)
 	{}
 
-	~RBTree()
-	{
-		Destory();
-		_root = NULL;
-	}
-
 public:
 	bool Insert(const K& key, const V& value)
 	{
@@ -111,13 +105,13 @@ public:
 				{
 					if(cur == parent->_right)
 					{
-						_RotateL(parent, _root);
-						parent = cur;
+						_RotateL(parent);
+						swap(cur, parent);
 					}
 
 					grandfather->_colour = RED;
 					parent->_colour = BLACK;
-					_RotateR(grandfather, _root);
+					_RotateR(grandfather);
 				}
 			}
 			else
@@ -136,13 +130,13 @@ public:
 				{
 					if(cur == parent->_left)
 					{
-						_RotateR(parent, _root);
-						parent = cur;
+						_RotateR(parent);
+						swap(cur, parent);
 					}
 
 					grandfather->_colour = RED;
 					parent->_colour = BLACK;
-					_RotateL(grandfather, _root);
+					_RotateL(grandfather);
 
 				}
 			}
@@ -153,63 +147,72 @@ public:
 		return true;
 	}
 
-	void _RotateR(Node* parent, Node*& root)
+	void _RotateL(Node* parent)
 	{
-		Node* subL = parent->_left;
-		Node* subLR = subL->_right;
-		parent->_left = subLR;
-		if (subLR)
-		{
-			subLR->_parent = parent;
-		}
-
-		subL->_right = parent;
-
-		if (parent == _root)
-		{
-			_root = subL;
-		}
-		else if (parent->_parent->_left == parent)
-		{
-			parent->_parent->_left = subL;
-		}
-		else
-		{
-			parent->_parent->_right = subL;
-		}
-
-		subL->_parent = parent->_parent;
-		parent->_parent = subL;
-	}
-
-	void _RotateL(Node* parent, Node*& root)
-	{
+		// 提升右孩子
 		Node* subR = parent->_right;
 		Node* subRL = subR->_left;
 
+		// 1.右孩子的左子树交给父节点的右
 		parent->_right = subRL;
 		if (subRL)
-		{
 			subRL->_parent = parent;
-		}
 
+		// 2.父节点变成右孩子的左
 		subR->_left = parent;
+		subR->_parent = parent->_parent;
 
-		if (parent == _root)
+		Node* ppNode = parent->_parent;
+		parent->_parent = subR;
+
+		if (ppNode == NULL)
 		{
 			_root = subR;
-		}
-		else if (parent->_parent->_left == parent)
-		{
-			parent->_parent->_left = subR;
+			subR->_parent = NULL;
 		}
 		else
 		{
-			parent->_parent->_right = subR;
-		}
+			if (ppNode->_left == parent)
+				ppNode->_left = subR;
+			else
+				ppNode->_right = subR;
 
-		subR->_parent = parent->_parent;
-		parent->_parent = subR;
+			subR->_parent = ppNode;
+		}
+	}
+
+	void _RotateR(Node*& parent)
+	{
+		// 提升左孩子
+		Node* subL = parent->_left;
+		Node* subLR = subL->_right;
+
+		parent->_left = subLR;
+		if (subLR)
+			subLR->_parent = parent;
+
+		subL->_right = parent;
+		subL->_parent = parent->_parent;
+
+		Node* ppNode = parent->_parent;
+		parent->_parent = subL;
+
+		parent = subL;
+
+		if (ppNode == NULL)
+		{
+			_root = subL;
+			subL->_parent = NULL;
+		}
+		else
+		{
+			if (ppNode->_left == parent)
+				ppNode->_left = subL;
+			else
+				ppNode->_right = subL;
+
+			subL->_parent = ppNode;
+		}
 	}
 
 	void InOrder()
@@ -218,52 +221,57 @@ public:
 		cout<<endl;
 	}
 
-	bool IsBalance()
+	bool IsBlance()
 	{
-		return _IsBalance(_root);
-	}
+		if (_root == NULL)
+			return true;
 
-	void Destory()
-	{
-		_Destory(_root);
-		_root = NULL;
-	}
+		if (_root->_colour == RED)
+			return false;
 
-protected:
-	void _Destory(Node* root)
-	{
-		if (root == NULL)
+		// 计算一条路径上黑色节点的数量
+		int k = 0;
+		Node* cur = _root;
+		while(cur)
 		{
-			return;
+			if (cur->_colour == BLACK)
+				++k;
+
+			cur = cur->_left;
 		}
 
-		_Destory(root->_left);
-		_Destory(root->_right);
-
-		delete root;
+		int count = 0;
+		return _IsBlance(_root, k, count);
 	}
 
-	bool _IsBalance(Node* root)
+	bool _IsBlance(Node* root, const int k, int count)
 	{
 		if (root == NULL)
-		{
-			return 0;
-		}
+			return true;
 
-		int left = _IsBalance(root->_left)+1;
-		int right = _IsBalance(root->_right)+1;
-
-		if (left > right && left > 2*right)
+		// 3.检查是否存在连续的红节点
+		if (root->_colour == RED && root->_parent->_colour == RED)
 		{
+			cout<<"连续红节点"<<root->_key<<endl;
 			return false;
 		}
 
-		if(left < right && left*2 < right)
+		if (root->_colour == BLACK)
 		{
+			++count;
+		}
+
+		// 4.检查黑色节点的数量是否相等
+		if (root->_left ==  NULL
+			&& root->_right == NULL
+			&& k != count)
+		{
+			cout<<"黑色节点的数量不相等"<<root->_key<<endl;
 			return false;
 		}
 
-		return true;
+		return _IsBlance(root->_left, k, count)
+			&& _IsBlance(root->_right, k, count);
 	}
 
 	void _InOrder(Node* root)
@@ -294,20 +302,5 @@ void TestRBTree()
 
 	t1.InOrder();
 
-	cout<<"t1 IsBalance:"<<t1.IsBalance()<<endl;
-
-	// 测试是否平衡
-	srand(time(0));
-	RBTree<int, int> t2;
-	for (size_t i = 1; i < 1000; ++i)
-	{
-		t2.Insert(rand()%1000, i);
-
-		if (i %100 == 0)
-		{
-			t2.InOrder();
-			cout<<"t2 IsBalance:"<<t2.IsBalance()<<endl;
-			t2.Destory();
-		}
-	}
+	cout<<"t1 IsBlance:"<<t1.IsBlance()<<endl;
 }

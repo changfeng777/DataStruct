@@ -1,20 +1,23 @@
 #pragma once
 
-#include "Common.h"
 
 // M路平衡B树
 
 template<class K, size_t M = 3>
 struct BTreeNode
 {
-	// 关键字 -- ps:_keys[M-1]位置不存实际的值，主要用于分裂时方便处理
+	// KV结构
+	//pair<K,V> _kvs[M];
+
+	// 关键字、孩纸
+	// 关键字和孩纸都多给一个，先插入节点再进行分裂
+	// 简化了分裂逻辑，但是效率会低一些
 	K _keys[M];	
-	// 孩子	  -- ps:第M+1位不用于实际中存储数据，只是在分裂前方便插入数据
 	BTreeNode<K, M>* _subs[M+1];		
+
 	size_t _size;						// 关键字个数
 
 	BTreeNode<K, M>* _parent;			// 父亲
-	//bool _isLeaf;						// 是否是叶子节点
 
 	BTreeNode()
 		:_parent(NULL)
@@ -37,22 +40,22 @@ public:
 		:_root(NULL)
 	{}
 
-	// Pair<Node*, int> Node*为节点指针，int为关键字位置，-1则表示不存在
-	Pair<Node*, int> Find(const K& key)
+	// pair<Node*, int> Node*为节点指针，int为关键字位置，-1则表示不存在
+	pair<Node*, int> Find(const K& key)
 	{
 		Node* parent = NULL;
 		Node* cur = _root;
 		while(cur)
 		{
 			size_t i = 0;
-			while(i < cur->_size && cur->_keys[i] < key)
+			while(i < cur->_size)
 			{
-				++i;
-			}
-
-			if (cur->_keys[i] == key)
-			{
-				return Pair<Node*, int>(cur, i);
+				if (cur->_keys[i] == key)
+					return pair<Node*, int>(cur, i);
+				else if (cur->_keys[i] < key)
+					++i;
+				else
+					break;
 			}
 
 			parent = cur;
@@ -60,7 +63,7 @@ public:
 		}
 
 		// 没有找到key则返回叶子节点，下标值为-1，这样方便Insert/Remove时复用
-		return Pair<Node*, int>(parent, -1);
+		return pair<Node*, int>(parent, -1);
 	}
 
 	bool Insert(const K& key)
@@ -73,16 +76,20 @@ public:
 			return true;
 		}
 
-		Pair<Node*, int> ret = Find(key);
-		if (ret._second != -1)
+		pair<Node*, int> ret = Find(key);
+		if (ret.second != -1)
 		{
 			return false;
 		}
 
+		// 在cur节点中插入k和sub，最开始sub为空
+		// 分裂后把中间节点和分裂出来的节点同样的逻辑往父节点插入
+		// 如果插入后cur节点<M，则满足条件，否则一直网上分裂，直到根节点
+		//
 		K  k = key;
-		Node* cur = ret._first;
+		Node* cur = ret.first;
 		Node* sub = NULL;
-		while (cur)
+		while (1)
 		{
 			_InsertKey(cur, k, sub);
 			if (cur->_size < M)

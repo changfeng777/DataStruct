@@ -21,18 +21,17 @@ int main()
 {
 	//TestBinaryTree();
 	//TestBinaryTree_P();
-	//Topic::TestBinaryTreeTopic();
+	BinaryTreeTopic().TestBinaryTreeTopic();
 	//TestBinaryTreeThd();
 	//TestHeap();
 	//TestRedPacket();
 
 	//TestHuffmanTree_A();
-	TestFileCompress();
+	//TestFileCompress();
 	//TestBSTree();
 
-	//NonRecursion::TestAVLTree();
-	//Recursion::TestAVLTree();
-	//TestRBTree();
+	//TestAVLTree();
+	TestRBTree();
 
 	//TestBTree();
 

@@ -42,11 +42,6 @@ public:
 		:_root(NULL)
 	{}
 
-	/*BinaryTreeThd(const char* array1)
-	{
-		_CreateTree(_root, array1);
-	}*/
-
 	BinaryTreeThd(T array[], size_t size)
 	{
 		int index = 0;
@@ -112,33 +107,6 @@ protected:
 				root->_right->_parent = root;
 			}
 		}
-	//}
-
-	// 构建二叉树
-	//void _CreateTree(BinaryTreeNodeThd<T>*& root, const char*& str)
-	//{
-	//	//
-	//	// ps:这里给char* str做输入仅仅是为了方便测试。
-	//	// 实际而言给char*的输入限制了T的类型。^^
-	//	//
-	//	if (*str != '\0' && *str != '#')
-	//	{
-	//		root = new BinaryTreeNodeThd<T>(*str);
-	//		_CreateTree(root->_left, ++str);
-	//		if (root->_left)
-	//		{
-	//			root->_left->_parent = root;
-	//		}
-
-	//		if (*str == '\0')
-	//			return;
-
-	//		_CreateTree(root->_right, ++str);
-	//		if (root->_right)
-	//		{
-	//			root->_right->_parent = root;
-	//		}
-	//	}
 	}
 
 	void _InThreading(BinaryTreeNodeThd<T>* cur, BinaryTreeNodeThd<T>*& prev)
@@ -266,7 +234,7 @@ protected:
 				cur = cur->_left;
 			}
 
-			// 访问连接在一起的后继节点
+			// 访问连接在一起的后继节点--这样处理有bug
 			/*while (cur->_rightTag == THREAD && cur->_right)
 			{
 				cur = cur->_right;
@@ -284,11 +252,8 @@ protected:
 
 	void _PostOrder(BinaryTreeNodeThd<T>* root)
 	{
-		BinaryTreeNodeThd<T>* cur = NULL;
+		BinaryTreeNodeThd<T>* cur = root;
 		BinaryTreeNodeThd<T>* prev = NULL;
-
-		if (root)
-			cur = root->_left;
 
 		while (cur)
 		{
@@ -299,7 +264,7 @@ protected:
 			}
 
 			// 访问后继节点
-			while(cur && cur->_rightTag == THREAD)
+			while(cur->_rightTag == THREAD)
 			{
 				cout<<cur->_data<<" ";
 				prev = cur;
@@ -313,17 +278,20 @@ protected:
 				break;
 			}
 
-			// 如果当前节点的右节点已访问，则跳到父节点
-			while(cur && cur->_right == prev)
+			// 如果当前节点的右节点已访问，则访问当前节点并跳到父节点
+			while(cur->_right == prev)
 			{
 				cout<<cur->_data<<" ";
 				prev = cur;
 
-				cur = cur->_parent;			
+				if (cur == root)
+					return;
+
+				cur = cur->_parent;		
 			}
 			
-			// 走当前节点的右树
-			if (cur && cur->_rightTag == LINK)
+			// 跳转到当前节点的右树，当做子树访问
+			if (cur->_rightTag == LINK)
 				cur = cur->_right;
 		}
 	}
