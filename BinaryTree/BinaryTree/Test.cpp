@@ -21,17 +21,17 @@ int main()
 {
 	//TestBinaryTree();
 	//TestBinaryTree_P();
-	BinaryTreeTopic().TestBinaryTreeTopic();
+	//BinaryTreeTopic().TestBinaryTreeTopic();
 	//TestBinaryTreeThd();
 	//TestHeap();
 	//TestRedPacket();
 
 	//TestHuffmanTree_A();
-	//TestFileCompress();
+	TestFileCompress();
 	//TestBSTree();
 
 	//TestAVLTree();
-	TestRBTree();
+	//TestRBTree();
 
 	//TestBTree();
 

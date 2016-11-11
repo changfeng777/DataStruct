@@ -225,7 +225,9 @@ public:
 				infoStr += countStr;
 				infoStr += '\n';
 
-				fputs(infoStr.c_str(), fInConfig);
+				// 这里使用fputs有问题，当ch==0时，fputs什么都没写进去
+				fwrite(infoStr.c_str(), 1, infoStr.size(), fInConfig);
+				//fputs(infoStr.c_str(), fInConfig)
 			}
 		}
 
@@ -345,7 +347,8 @@ void TestCompress()
 	FileCompress fc;
 
 	int begin = GetTickCount();
-	fc.Compress("Input.BIG");
+	//fc.Compress("Input.BIG");
+	fc.Compress("1.MP4");
 	int end = GetTickCount();
 
 	cout<<"Compress:"<<end - begin<<endl;
@@ -355,7 +358,8 @@ void TestUncompress()
 {
 	FileCompress fc;
 	int begin = GetTickCount();
-	fc.Uncompress("Input.BIG");
+	//fc.Uncompress("Input.BIG");
+	fc.Uncompress("1.MP4");
 	int end = GetTickCount();
 
 	cout<<"Compress:"<<end - begin<<endl;

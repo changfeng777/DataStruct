@@ -127,38 +127,61 @@ public:
 	}
 
 	// 非递归实现前/中/后序遍历
+	//void PrevOrder_NonR()
+	//{
+	//	cout<<"PrevOrder_NonR:";
+	//	stack<BinaryTreeNode<T>*> s;
+	//	if (_root)
+	//	{
+	//		s.push(_root);
+	//	}
+
+	//	while (!s.empty())
+	//	{
+	//		//
+	//		// 先访问根节点，先入右节点再入左节点，
+	//		// 出栈时才能先访问到左节点，再访问到右节点。
+	//		//
+	//		BinaryTreeNode<T>* root = s.top();
+	//		cout<<root->_data<<" ";
+	//		s.pop();
+
+	//		if (root->_right)
+	//		{
+	//			s.push(root->_right);
+	//		}
+
+	//		if (root->_left)
+	//		{
+	//			s.push(root->_left);
+	//		}
+	//	}
+
+	//	cout<<endl;
+	//}
+
 	void PrevOrder_NonR()
 	{
 		cout<<"PrevOrder_NonR:";
 		stack<BinaryTreeNode<T>*> s;
-		if (_root)
+		BinaryTreeNode<T>* cur = _root;
+		while (cur || !s.empty())
 		{
-			s.push(_root);
-		}
+			while (cur)
+			{
+				cout<<cur->_data<<" ";
+				s.push(cur);
+				cur = cur->_left;
+			}
 
-		while (!s.empty())
-		{
-			//
-			// 先访问根节点，先入右节点再入左节点，
-			// 出栈时才能先访问到左节点，再访问到右节点。
-			//
-			BinaryTreeNode<T>* root = s.top();
-			cout<<root->_data<<" ";
+			cur = s.top();
 			s.pop();
-
-			if (root->_right)
-			{
-				s.push(root->_right);
-			}
-
-			if (root->_left)
-			{
-				s.push(root->_left);
-			}
+			cur = cur->_right;
 		}
 
 		cout<<endl;
 	}
+
 
 	void InOrder_NonR()
 	{
