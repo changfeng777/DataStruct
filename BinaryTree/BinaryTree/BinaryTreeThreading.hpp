@@ -34,6 +34,86 @@ struct BinaryTreeNodeThd
 	{}
 };
 
+// 增加二叉树线索化以后的迭代器
+template<class T, class Ref, class Ptr>
+struct BinaryTreeIterator
+{			
+	typedef BinaryTreeNodeThd<T> Node;
+	typedef BinaryTreeIterator<T, Ref, Ptr> Self;
+
+	Node* _node;
+
+	BinaryTreeIterator(Node* node)
+		:_node(node)
+	{}
+
+	Ref operator*()
+	{
+		return _node->_data;
+	}
+
+	Ptr operator->()
+	{
+		return &(operator*());
+	}
+
+	Self& operator++()
+	{
+		_node = _Next(_node);
+		return *this;
+	}
+
+	Self operator++(int)
+	{
+		Self tmp(*this);
+		_node = _Next(_node);
+		return tmp;
+	}
+
+	bool operator != (const Self& s) const
+	{
+		return _node != s._node;
+	}
+
+protected:
+	// _Inc
+	Node* _Next(Node* node)
+	{
+		if (node->_rightTag == THREAD)
+		{
+			return node->_right;
+		}
+		else
+		{
+			Node* cur = node->_right;
+			while (cur->_leftTag == LINK)
+			{
+				cur = cur->_left;
+			}
+
+			return cur;
+		}
+	}
+
+	Node* _Prev(Node* node)
+	{
+		if (node->_leftTag == THREAD)
+		{
+			return node->_left;
+		}
+		else
+		{
+			Node* cur = node;
+			while (cur->_rightTag == LINK)
+			{
+				cur = cur->_right;
+			}
+
+			return cur;
+		}
+	}
+};
+
 template<class T>
 class BinaryTreeThd
 {
@@ -308,6 +388,14 @@ void TestBinaryTreeThd()
 	BinaryTreeThd<int> t1(array1, 10);
 	t1.InThreading();
 	t1.InOrder();
+
+	BinaryTreeThd<int>::Iterator it = t1.Begin();
+	while (it != t1.End())
+	{
+		cout<<*it<<" ";
+		++it;
+	}
+	cout<<endl;
 
 	BinaryTreeThd<int> t2(array1, 10);
 	t2.PrevThreading();

@@ -10,7 +10,8 @@ Created Time: 2015-8-1
 #pragma once
 #include <stack>
 
-// ps:作业扩展使用递归实现迷宫，并比较非递归实现
+// ps:1.作业扩展使用递归实现迷宫，并比较非递归实现
+//	  2.求迷宫问题的最优解
 
 struct Pos
 {
@@ -84,7 +85,7 @@ bool CheckIsAccess(int** ppMaze, int n, Pos pos)
 	return false;
 }
 
-bool Maze(int** ppMaze, int n, const Pos& entry, stack<Pos>& path)
+bool GetMazePath(int** ppMaze, int n, const Pos& entry, stack<Pos>& path)
 {
 	assert(entry.col < n && entry.row < n);
 	
@@ -149,6 +150,88 @@ bool Maze(int** ppMaze, int n, const Pos& entry, stack<Pos>& path)
 	return false;
 }
 
+bool CheckIsAccess(int** ppMaze, int n, Pos cur, Pos next)
+{
+	if (next.col < 0 || next.col >= n 
+		|| next.row < 0 || next.row >= n
+		|| ppMaze[next.row][next.col] == 1)
+	{
+		return false;
+	}
+
+	if (ppMaze[next.row][next.col] == 0)
+	{
+		return true;
+	}
+	else
+	{
+		return ppMaze[cur.row][cur.col]+1 < ppMaze[next.row][next.col];
+	}
+}
+
+// 求迷宫的最优解--最短路径
+void GetShortMazePath(int** ppMaze, int n, const Pos& entry,
+					  stack<Pos>& path, stack<Pos>& minPath)
+{
+	assert(ppMaze);
+
+	Pos cur = entry;
+	Pos next = cur;
+
+	path.push(cur);
+
+	// 已经到达出口
+	if (next.row == n-1)
+	{
+		if (minPath.empty() || minPath.size() > path.size())
+		{
+			minPath = path;
+
+			PrintMaze(ppMaze,n);
+		}
+		return;
+	}
+
+	// 上
+	next = cur;
+	next.row -= 1;
+	if(CheckIsAccess(ppMaze, n, cur, next))
+	{
+		ppMaze[next.row][next.col] = ppMaze[cur.row][cur.col]+1;
+		GetShortMazePath(ppMaze, n, next, path, minPath);
+	}
+
+	// 右
+	next = cur;
+	next.col += 1;
+	if(CheckIsAccess(ppMaze, n, cur, next))
+	{
+		ppMaze[next.row][next.col] = ppMaze[cur.row][cur.col]+1;
+		GetShortMazePath(ppMaze, n, next, path, minPath);
+	}
+
+
+	// 下
+	next = cur;
+	next.row += 1;
+	if(CheckIsAccess(ppMaze, n, cur, next))
+	{
+		ppMaze[next.row][next.col] = ppMaze[cur.row][cur.col]+1;
+		GetShortMazePath(ppMaze, n, next, path, minPath);
+	}
+
+	// 左
+	next = cur;
+	next.col -= 1;
+	if(CheckIsAccess(ppMaze, n, cur, next))
+	{
+		ppMaze[next.row][next.col] = ppMaze[cur.row][cur.col]+1;
+		GetShortMazePath(ppMaze, n, next, path, minPath);
+	}
+
+	path.pop();
+}
+
 void TestMaze()
 {
 	int n = 10;
@@ -156,16 +239,18 @@ void TestMaze()
 	Pos entry = InitMaze(ppMaze, n);
 	PrintMaze(ppMaze, n);
 
-	stack<Pos> path;
-	Maze(ppMaze, n, entry, path);
+	stack<Pos> path, minPath;
+	ppMaze[entry.row][entry.col] = 2;
+	GetShortMazePath(ppMaze, n, entry, path, minPath);
+	//GetMazePath(ppMaze, n, entry, path);
 	PrintMaze(ppMaze, n);
 
-	cout<<"Path:";
-	while (!path.empty())
+	cout<<"minPath:";
+	while (!minPath.empty())
 	{
-		const Pos& pos = path.top();
+		const Pos& pos = minPath.top();
 		cout<<"("<<pos.row<<"，"<<pos.col<<")"<<"<-";
-		path.pop();
+		minPath.pop();
 	}
 
 	cout<<"Entry"<<endl;
