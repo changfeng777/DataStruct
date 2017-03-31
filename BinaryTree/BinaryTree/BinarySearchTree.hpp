@@ -27,6 +27,8 @@ public:
 	{}
 	~BSTree()
 	{}
+
+	// 让学生练习实现，跟前面二叉树部分是一样的
 	BSTree(const BSTree& t);
 	BSTree&operator=(const BSTree& t);
 
@@ -79,12 +81,6 @@ public:
 		if (_root == NULL)
 		{
 			return false;
-		}
-		else if (_root->_left == NULL && _root->_right == NULL)
-		{
-			delete _root;
-			_root = NULL;
-			return true;
 		}
 
 		Node* parent = NULL;
@@ -349,6 +345,19 @@ void TestBSTree()
 	t.Remove(8);
 	t.Remove(1);
 	t.Remove(5);
+
+	t.Remove(0);
+	t.Remove(1);
+	t.Remove(2);
+	t.Remove(3);
+	t.Remove(4);
+	t.Remove(5);
+	t.Remove(6);
+	t.Remove(7);
+	t.Remove(8);
+	t.Remove(9);
+	t.Remove(10);
+
 
 	t.PrevOrder();
 }

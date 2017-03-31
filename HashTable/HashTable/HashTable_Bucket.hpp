@@ -581,7 +581,6 @@ namespace Bucket
 	{
 		pair<K, V> _kv;
 		HashNode<K, V>* _next;
-		//HashNode<K, V>* _prev;
 
 		HashNode(const pair<K,V>& kv)
 			:_kv(kv)
